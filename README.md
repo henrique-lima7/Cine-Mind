@@ -20,31 +20,31 @@ Abaixo você pode conferir o fluxo completo da aplicação e como o design premi
 ### 1️⃣ Tela Inicial
 Interface escura com efeitos de luz ambiente adaptativa nas bordas, tags rápidas de humor e sistema integrado de busca por texto ou comando de voz nativo.
 <p align="center">
-  <img src="image_51364f.jpg" width="90%" alt="Tela Inicial do CineMind">
+  <img width="1024" height="469" alt="image" src="https://github.com/user-attachments/assets/5dda95e5-18ac-4739-a49c-81b66a7fe8cf" />
 </p>
 
 ### 2️⃣ Geração do Filme com IA
 O sistema exibe o resultado utilizando um efeito dinâmico de digitação (*typewriter effect*), destaca as plataformas com as cores oficiais das marcas de streaming e adiciona um painel interativo de feedback para refinar a busca.
 <p align="center">
-  <img src="image_5187e7.jpg" width="90%" alt="Card de Recomendação Gerado pela IA">
+  <img width="1023" height="474" alt="image" src="https://github.com/user-attachments/assets/b57b58e9-b2be-4c5d-89e9-5d4bb333d5ab" />
 </p>
 
 ### 3️⃣ Menu do Chef — Combo de Comida
 Com um único clique no botão sob demanda, a inteligência artificial analisa o clima específico do filme escolhido e monta um combo gastronômico personalizado com bebida, petisco principal e sobremesa temática.
 <p align="center">
-  <img src="image_51882b.jpg" width="90%" alt="Sugestão de Combo Temático">
+  <img width="1024" height="472" alt="image" src="https://github.com/user-attachments/assets/ae1b1aba-290f-4bd4-b152-ae3c5ac8c582" />
 </p>
 
 ### 4️⃣ Histórico da Sessão
 Acompanhe de forma simples tudo o que a IA gerou para você na aba de histórico local. Os itens salvam o horário relativo da busca e se há um combo atrelado àquela sugestão.
 <p align="center">
-  <img src="image_518888.jpg" width="90%" alt="Painel de Histórico">
+  <img width="1024" height="460" alt="image" src="https://github.com/user-attachments/assets/5880b186-5dfe-46e6-9d3b-6c2de4dc369e" />
 </p>
 
 ### 5️⃣ Ranking Top 10 Global
 O coração social da plataforma: um painel que exibe dinamicamente os títulos de maior sucesso entre todos que acessam o sistema.
 <p align="center">
-  <img src="image_518ba9.jpg" width="90%" alt="Painel do Top 10 Global">
+  <img width="1897" height="862" alt="image" src="https://github.com/user-attachments/assets/38c0f6a0-2cf6-424c-b96e-9b21aa2a5628" />
 </p>
 
 ---
