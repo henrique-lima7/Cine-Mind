@@ -1,4 +1,4 @@
-# 🎬 CineMind — Sua IA do Cinema Premium
+# 🎬 CineMind — Sua IA do Cinema Premium 🍿
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.9+-blue.svg" alt="Python Version">
@@ -78,9 +78,4 @@ O **Top 10** do CineMind opera em tempo real e de forma **totalmente persistente
 
 ---
 
-## 🚀 Como Executar o Projeto Localmente
-
-1. **Clone o repositório:**
-```bash
-   git clone [https://github.com/SEU-USUARIO/cinemind.git](https://github.com/SEU-USUARIO/cinemind.git)
-   cd cinemind
+🍿Desenvolvedor:👤 José Henrique.
