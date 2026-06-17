@@ -1,0 +1,2497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMind — Sua IA do Cinema</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ════════════════════════════════════════════════════
+           TOKENS & RESET
+        ════════════════════════════════════════════════════ */
+        :root {
+            /* Base charcoal/azul-marinho — substitui o veludo vermelho como cor dominante */
+            --carpet-dark: #0a0c10;
+            --weave-dot:   rgba(255,255,255,0.025);
+            --navy:        #11151c;   /* painéis sólidos (drawer, combo-trigger) */
+            --navy-mid:    #161b24;   /* scrollbar track */
+            --navy-card:   #1a1f2a;   /* cards/inputs (textarea, loading-box, top10) */
+            /* Cores de curtain (mantidas só para a intro de veludo vermelho) */
+            --cinema-red:  #2d0a0a;
+            --velvet-red:  #4a1212;
+            --gold-light:  #f39c12;
+            --gold-glow:   rgba(243, 156, 18, 0.3);
+            --border:      rgba(255,255,255,0.08);
+            --border-hover:rgba(255,255,255,0.16);
+            --amber:       #f39c12;
+            --amber-dim:   rgba(243,156,18,0.15);
+            --amber-glow:  rgba(243,156,18,0.06);
+            --red-accent:  #e74c3c;
+            --red-dim:     rgba(231,76,60,0.12);
+            --ivory:       #f4f1eb;
+            --ivory-mid:   #ede9e0;
+            --text-on-card:#1a1a1a;
+            --text-muted-card: #555;
+            --text-primary:#f5f5f5;
+            --text-secondary:#9aa3b0;
+            --text-muted:  #5c6470;
+            --radius-lg:   16px;
+            --radius-md:   10px;
+            --radius-sm:   6px;
+            --ease:        cubic-bezier(0.4,0,0.2,1);
+            --transition:  0.28s var(--ease);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--navy-mid); }
+::-webkit-scrollbar-thumb { background: var(--amber); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #f0aa38; }
+* { scrollbar-width: thin; scrollbar-color: var(--amber) var(--navy-mid); }
+/* ════════════════════════════════════════════════════
+           MODO CLARO — sobrescreve as variáveis do :root
+        ════════════════════════════════════════════════════ */
+        body.light-mode {
+            --carpet-dark:    #f0ece4;
+            --navy:           #e8e2d8;
+            --navy-mid:       #ddd8ce;
+            --navy-card:      #e4dfd5;
+            --border:         rgba(0,0,0,0.10);
+            --border-hover:   rgba(0,0,0,0.20);
+            --amber-dim:      rgba(180,100,0,0.15);
+            --amber-glow:     rgba(180,100,0,0.08);
+            --text-primary:   #1a1208;
+            --text-secondary: #5a4e3a;
+            --text-muted:     #8a7e6a;
+            --ivory:          #fff8ef;
+            --ivory-mid:      #f5eddf;
+            --text-on-card:   #1a1208;
+            --red-dim:        rgba(180,50,30,0.10);
+            background-color: #f0ece4;
+            background-image:
+                radial-gradient(rgba(0,0,0,0.03) 1px, transparent 0),
+                radial-gradient(rgba(0,0,0,0.03) 1px, transparent 0),
+                radial-gradient(circle at 50% -10%, rgba(200,120,0,0.06), transparent 60%),
+                linear-gradient(180deg, #e8e2d6 0%, #f0ece4 45%, #e8e2d6 100%);
+        }
+        /* Navbar no modo claro */
+        body.light-mode .navbar {
+            background: rgba(240,236,228,0.96);
+            border-bottom-color: rgba(0,0,0,0.10);
+        }
+        /* Cards de histórico e mídia no modo claro */
+        body.light-mode .history-item,
+        body.light-mode .media-card {
+            background: rgba(255,250,242,0.85);
+            border-color: rgba(0,0,0,0.08);
+        }
+        /* Luzes de canto mais suaves no modo claro */
+        body.light-mode .corner-light {
+            background: radial-gradient(circle,
+                rgba(180, 100, 0, 0.15) 0%,
+                rgba(180, 100, 0, 0.05) 35%,
+                transparent 70%
+            );
+        }
+        /* Vinheta mais suave no modo claro */
+        body.light-mode .room-dim-overlay {
+            background: radial-gradient(ellipse at 50% 45%,
+                transparent 30%,
+                rgba(0,0,0,0.06) 100%
+            );
+        }
+        /* Drawer no modo claro */
+        body.light-mode .drawer {
+            background: #e8e2d8;
+        }
+        /* Scrollbar no modo claro */
+        body.light-mode ::-webkit-scrollbar-track { background: #ddd8ce; }
+        body.light-mode * { scrollbar-color: var(--amber) #ddd8ce; }
+        /* Corrige títulos e textos que usavam branco fixo (#fff) —
+   no modo claro eles ficavam ilegíveis sobre fundo claro */
+body.light-mode .intro-logo .mark,
+body.light-mode .hero h1,
+body.light-mode .section-header h2,
+body.light-mode .drawer-head h2,
+body.light-mode .how-text h3 {
+    color: var(--text-primary);
+}
+/* nav-brand usa var(--amber), que já é visível, mas o "🎬" e contraste
+   geral da navbar no claro merecem reforço de leitura */
+body.light-mode .nav-brand {
+    color: #8a4b00;
+}
+/* Texto do tagline da intro também é branco fixo com opacidade —
+   ajusta para o modo claro (a intro roda sobre fundo escuro sempre,
+   então este aqui NÃO muda — está aqui só como nota, não precisa alterar) */
+   body.light-mode .intro-logo .mark,
+body.light-mode .hero h1,
+body.light-mode .section-header h2,
+body.light-mode .drawer-head h2,
+body.light-mode .how-text h3 {
+    color: var(--text-primary);
+}
+body.light-mode .nav-brand {
+    color: #8a4b00;
+}
+        /* Top 10 items no modo claro */
+        body.light-mode .top10-item {
+            background: #e4dfd5;
+            border-color: rgba(0,0,0,0.08);
+        }
+        body.light-mode .top10-item:first-child {
+            background: rgba(180,100,0,0.08);
+            border-color: rgba(180,100,0,0.3);
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--carpet-dark);
+            background-image:
+                radial-gradient(var(--weave-dot) 1px, transparent 0),
+                radial-gradient(var(--weave-dot) 1px, transparent 0),
+                radial-gradient(circle at 50% -10%, rgba(243,156,18,0.05), transparent 60%),
+                linear-gradient(180deg, #05060a 0%, var(--carpet-dark) 45%, #05060a 100%);
+            background-size: 8px 8px, 8px 8px, 100% 100%, 100% 100%;
+            background-position: 0 0, 4px 4px, 0 0, 0 0;
+            color: var(--text-primary);
+            min-height: 100vh;
+            /* position: relative criado para servir de referência ao
+               position:absolute das arandelas (ver .cinema-sconces) */
+            position: relative;
+            overflow-x: hidden;
+            transition: background-color 1.5s ease, filter 1.5s ease;
+        }
+        /* ════════════════════════════════════════════════════
+           INTRO CINEMATOGRÁFICA — CORTINAS
+        ════════════════════════════════════════════════════ */
+        #intro-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #050810;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: opacity 0.8s var(--ease), visibility 0.8s var(--ease);
+        }
+        #intro-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        /* Logo central na intro */
+        .intro-logo {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    animation: intro-logo-appear 0.8s 0.3s both,
+               intro-logo-fadeout 0.8s 3.2s both;
+}
+        .intro-logo .mark {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(2.8rem, 8vw, 5rem);
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.02em;
+            line-height: 1;
+            text-shadow: 0 0 60px rgba(232,160,48,0.5), 0 0 120px rgba(232,160,48,0.2);
+        }
+        .intro-logo .mark span {
+            color: var(--amber);
+        }
+        .intro-logo .tagline {
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.45);
+            margin-top: 10px;
+        }
+        /* Linha dourada embaixo da logo */
+        .intro-line {
+            width: 0;
+            height: 1.5px;
+            background: var(--amber);
+            margin: 14px auto 0;
+            animation: line-expand 0.6s 0.7s both;
+        }
+        /* ════════════════════════════════════════════════════
+           REVELAÇÃO DO CONTEÚDO (sincronizada com a abertura
+           das cortinas) — fade + leve zoom-in
+        ════════════════════════════════════════════════════ */
+        .content-reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 1.4s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.content-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+.navbar.content-reveal  { transition-delay: 0.1s; }
+.main.content-reveal    { transition-delay: 0.35s; }
+        /* ════════════════════════════════════════════════════
+           AMBIENT BACKGROUND
+        ════════════════════════════════════════════════════ */
+        .ambient {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .ambient::before {
+            content: "";
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(circle, rgba(232,160,48,0.05) 0%, transparent 65%);
+        }
+        .ambient::after {
+            content: "";
+            position: absolute;
+            bottom: -10%;
+            right: -10%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(circle, rgba(192,57,43,0.05) 0%, transparent 65%);
+        }
+        /* ════════════════════════════════════════════════════
+           LUZES DE CANTO — brilho dourado fixo nas bordas
+           Como refletores de cinema saindo fora da tela
+        ════════════════════════════════════════════════════ */
+        .corner-lights {
+            position: fixed;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .corner-light {
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            background: radial-gradient(circle,
+                rgba(243, 156, 18, 0.28) 0%,
+                rgba(243, 156, 18, 0.10) 35%,
+                transparent 70%
+            );
+            filter: blur(18px);
+            animation: corner-breathe 5s ease-in-out infinite;
+        }
+        /* Canto superior esquerdo — centro do círculo fora da tela */
+        .corner-tl {
+            top: -120px;
+            left: -120px;
+            animation-delay: 0s;
+        }
+        /* Canto superior direito */
+        .corner-tr {
+            top: -120px;
+            right: -120px;
+            animation-delay: 1.25s;
+        }
+        /* Canto inferior esquerdo */
+        .corner-bl {
+            bottom: -120px;
+            left: -120px;
+            animation-delay: 2.5s;
+        }
+        /* Canto inferior direito */
+        .corner-br {
+            bottom: -120px;
+            right: -120px;
+            animation-delay: 3.75s;
+        }
+        /* Respiração suave — intensidade varia levemente */
+        @keyframes corner-breathe {
+            0%, 100% { opacity: 0.75; }
+            50%       { opacity: 1;    }
+        }
+        /* Vinheta sutil no centro para dar profundidade */
+        .room-dim-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background: radial-gradient(ellipse at 50% 45%,
+                transparent 30%,
+                rgba(0, 0, 0, 0.25) 100%
+            );
+            pointer-events: none;
+        }
+        /* Em telas pequenas reduz o tamanho das luzes */
+        @media (max-width: 880px) {
+            .corner-light {
+                width: 200px;
+                height: 200px;
+                filter: blur(12px);
+            }
+            .corner-tl { top: -80px;  left: -80px;  }
+            .corner-tr { top: -80px;  right: -80px; }
+            .corner-bl { bottom: -80px; left: -80px;  }
+            .corner-br { bottom: -80px; right: -80px; }
+        }
+        /* ════════════════════════════════════════════════════
+           NAVBAR / ABAS
+        ════════════════════════════════════════════════════ */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(31, 5, 5, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        .navbar-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .nav-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--amber);
+            margin-right: 20px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            padding: 16px 0;
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 2px;
+            flex: 1;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .nav-tabs::-webkit-scrollbar { display: none; }
+        .nav-tab {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.83rem;
+            font-weight: 500;
+            padding: 18px 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            position: relative;
+            transition: color var(--transition);
+            border-bottom: 2px solid transparent;
+        }
+        .nav-tab:hover { color: var(--text-primary); }
+        .nav-tab.active {
+            color: var(--amber);
+            border-bottom-color: var(--amber);
+        }
+        /* Badge de contagem */
+        .nav-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 16px;
+            height: 16px;
+            padding: 0 4px;
+            border-radius: 8px;
+            background: var(--amber);
+            color: #000;
+            font-size: 0.65rem;
+            font-weight: 700;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+        /* ════════════════════════════════════════════════════
+           LAYOUT PRINCIPAL
+        ════════════════════════════════════════════════════ */
+        .main {
+            position: relative;
+            z-index: 1;
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+        /* Abas de conteúdo — altura mínima para as luzes não se aglomerar */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; min-height: 60vh; }
+        /* ════════════════════════════════════════════════════
+           ABA INÍCIO — HERO
+        ════════════════════════════════════════════════════ */
+        .hero {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--amber);
+            margin-bottom: 14px;
+        }
+        .hero-eyebrow::before, .hero-eyebrow::after {
+            content: "";
+            width: 24px;
+            height: 1px;
+            background: var(--amber);
+            opacity: 0.5;
+        }
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: 14px;
+        }
+        .hero-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.65;
+            max-width: 460px;
+            margin: 0 auto;
+        }
+        /* ════════════════════════════════════════════════════
+           FORMULÁRIO DE BUSCA
+        ════════════════════════════════════════════════════ */
+        .search-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .input-wrapper {
+            position: relative;
+        }
+        .input-wrapper .btn-voice-inline {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: rgba(20,24,32,0.85);
+            backdrop-filter: blur(6px);
+            color: var(--text-secondary);
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+            z-index: 2;
+        }
+        .input-wrapper .btn-voice-inline:hover {
+            border-color: rgba(232,160,48,0.5);
+            color: var(--amber);
+            background: rgba(20,24,32,0.95);
+        }
+        .input-wrapper .btn-voice-inline.recording {
+            border-color: #e74c3c;
+            color: #e74c3c;
+            background: rgba(231,76,60,0.15);
+            animation: pulse-rec 1.2s ease-in-out infinite;
+        }
+        textarea.search-input {
+            padding-bottom: 44px;
+        }
+        textarea.search-input {
+    width: 100%;
+    padding: 16px 18px;
+    background: var(--navy-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    resize: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+    min-height: 96px;
+}
+textarea.search-input::placeholder { color: var(--text-muted); }
+textarea.search-input:focus {
+    outline: none;
+    border-color: var(--amber);
+    animation: pulse-neon 1.8s ease-in-out infinite;
+}
+@keyframes pulse-neon {
+    0%, 100% { box-shadow: 0 0 0 3px var(--amber-dim), 0 0 12px rgba(232,160,48,0.15); }
+    50%      { box-shadow: 0 0 0 5px var(--amber-dim), 0 0 22px rgba(232,160,48,0.35); }
+}
+        .mood-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.mood-tag {
+    padding: 6px 13px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.04);
+    color: var(--text-secondary);
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+.mood-tag:hover {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: var(--amber-glow);
+    transform: translateY(-1px);
+}
+        .btn-row {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            padding: 14px 20px;
+            transition: all var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            position: relative;
+            overflow: hidden;
+        }
+.btn::before {
+    content: "";
+    position: absolute;
+    top: 0; left: -75%;
+    width: 50%; height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.25), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.6s var(--ease);
+    pointer-events: none;
+}
+.btn:hover::before { left: 125%; }
+.btn-primary {
+    background: var(--amber);
+    color: #0f1623;
+    flex: 2;
+    box-shadow: 0 4px 20px -6px rgba(232,160,48,0.4);
+}
+.btn-primary:hover {
+    background: #f0aa38;
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 8px 24px -6px rgba(232,160,48,0.5);
+}
+.btn-ghost {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    flex: 1;
+}
+.dice-emoji {
+    display: inline-block;
+    transition: transform 0.6s var(--ease);
+}
+#btn-surpresa:hover .dice-emoji {
+    animation: spin-dice 0.6s var(--ease);
+}
+@keyframes spin-dice {
+    0%   { transform: rotate(0deg) scale(1); }
+    50%  { transform: rotate(180deg) scale(1.25); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+.btn-ghost:hover {
+    background: rgba(255,255,255,0.09);
+    border-color: var(--border-hover);
+    transform: translateY(-1px) scale(1.02);
+}
+.btn:active { transform: translateY(0) scale(0.98); }
+        /* ════════════════════════════════════════════════════
+           LOADING
+        ════════════════════════════════════════════════════ */
+        .loading-box {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+            padding: 16px 18px;
+            background: var(--navy-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+        }
+        .loading-box.active { display: flex; }
+        .spinner {
+            width: 16px; height: 16px;
+            border: 2px solid rgba(232,160,48,0.2);
+            border-top-color: var(--amber);
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+            flex-shrink: 0;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        /* ════════════════════════════════════════════════════
+           CARD DE RESULTADO — FUNDO CLARO PARA LEITURA
+        ════════════════════════════════════════════════════ */
+        .result-card {
+            display: none;
+            margin-top: 20px;
+            background: var(--ivory);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            animation: rise 0.4s var(--ease);
+            box-shadow: 0 8px 40px -12px rgba(0,0,0,0.5);
+        }
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        /* Faixa superior âmbar do card */
+        .result-card-header {
+            background: var(--amber);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .result-card-header span {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #3a1f00;
+        }
+        /* Corpo do card (texto escuro sobre fundo claro) */
+        .result-card-body {
+            padding: 22px 24px;
+            color: var(--text-on-card);
+            font-size: 15px;
+            line-height: 1.75;
+        }
+        .result-card-body strong {
+            color: #8b1a00;
+            font-weight: 700;
+        }
+        /* Barra de ações do card — favoritar, assistido */
+        .result-actions {
+            padding: 14px 24px;
+            border-top: 1px solid var(--ivory-mid);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border: 1px solid #d0c8b8;
+            border-radius: 20px;
+            background: transparent;
+            color: #666;
+            font-family: 'Inter', sans-serif;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        .action-btn:hover {
+            background: var(--ivory-mid);
+            border-color: #b0a898;
+            color: #333;
+        }
+        .action-btn.active-fav {
+            background: #fff0f0;
+            border-color: #e8a0a0;
+            color: #c0392b;
+        }
+    .action-btn.pop-fav {
+    animation: pop-fav 0.45s var(--ease);
+}
+@keyframes pop-fav {
+    0%   { transform: scale(1); }
+    35%  { transform: scale(1.25); }
+    60%  { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+        .action-btn.active-watched {
+            background: #f0f9f0;
+            border-color: #80c880;
+            color: #2e7d2e;
+        }
+        /* Botão de combo */
+        .combo-trigger-btn {
+            margin: 14px 24px 20px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 18px;
+            background: var(--navy);
+            border: 1px solid var(--amber);
+            border-radius: var(--radius-md);
+            color: var(--amber);
+            font-family: 'Inter', sans-serif;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+            width: calc(100% - 48px);
+            justify-content: center;
+        }
+        .combo-trigger-btn.visible { display: flex; }
+        .combo-trigger-btn:hover {
+            background: var(--amber-dim);
+        }
+        /* Card do combo (aparece abaixo do resultado) */
+        .combo-card {
+            display: none;
+            margin: 0 24px 20px;
+            background: var(--navy-card);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--amber);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            font-size: 14px;
+            line-height: 1.75;
+            color: var(--text-primary);
+            animation: rise 0.4s var(--ease);
+        }
+        .combo-card.visible { display: block; }
+        .combo-card strong { color: var(--amber); font-weight: 600; }
+        /* ════════════════════════════════════════════════════
+           ABA COMBO MONTAR
+        ════════════════════════════════════════════════════ */
+        .section-header {
+            margin-bottom: 24px;
+        }
+        .section-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+        /* ════════════════════════════════════════════════════
+           ABA HISTÓRICO
+        ════════════════════════════════════════════════════ */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .history-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(28, 42, 58, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-md);
+    animation: rise 0.3s var(--ease);
+}
+        .history-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--amber-dim);
+            border: 1px solid rgba(232,160,48,0.3);
+            color: var(--amber);
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .history-info { flex: 1; min-width: 0; }
+        .history-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .history-time {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        /* ════════════════════════════════════════════════════
+           ABA FAVORITOS & ASSISTIDOS
+        ════════════════════════════════════════════════════ */
+        .section-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .section-tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        .section-tab.active {
+            background: var(--amber);
+            border-color: var(--amber);
+            color: #0f1623;
+        }
+        .fav-grid, .watched-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .media-card {
+    background: rgba(28, 42, 58, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    transition: border-color var(--transition);
+}
+        .media-card:hover { border-color: var(--border-hover); }
+        .media-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+        .media-card-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+        .remove-btn {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            padding: 0;
+            transition: color var(--transition);
+        }
+        .remove-btn:hover { color: var(--red-accent); }
+        /* ════════════════════════════════════════════════════
+           ABA TOP 10
+        ════════════════════════════════════════════════════ */
+        .top10-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .top10-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 18px;
+            background: var(--navy-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+        }
+        .top10-item:first-child {
+            border-color: rgba(232,160,48,0.4);
+            background: rgba(232,160,48,0.06);
+        }
+        .top10-rank {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            width: 40px;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+        .top10-item:first-child .top10-rank { color: var(--amber); }
+        .top10-info { flex: 1; }
+        .top10-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .top10-count {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+        /* ════════════════════════════════════════════════════
+           ESTADO VAZIO
+        ════════════════════════════════════════════════════ */
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state .icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+        .empty-state p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+        /* ════════════════════════════════════════════════════
+           DRAWER "COMO FUNCIONA"
+        ════════════════════════════════════════════════════ */
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(3px);
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition), visibility var(--transition);
+        }
+        .drawer-overlay.open { opacity: 1; visibility: visible; }
+        .drawer {
+            position: fixed;
+            top: 0; right: 0;
+            height: 100%;
+            width: min(420px, 100vw);
+            background: var(--navy-mid);
+            border-left: 1px solid var(--border);
+            z-index: 201;
+            transform: translateX(100%);
+            transition: transform 0.4s var(--ease);
+            overflow-y: auto;
+            padding: 28px 24px;
+        }
+        .drawer.open { transform: translateX(0); }
+        .drawer-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+        .drawer-head h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .drawer-close {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition);
+        }
+        .drawer-close:hover { background: var(--red-dim); color: #e06060; }
+        .how-step {
+            display: flex;
+            gap: 14px;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .how-step:last-child { border-bottom: none; }
+        .how-num {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            background: var(--amber-dim);
+            border: 1px solid rgba(232,160,48,0.3);
+            color: var(--amber);
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .how-text h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        .how-text p {
+            font-size: 13px;
+            line-height: 1.65;
+            color: var(--text-secondary);
+        }
+        /* ════════════════════════════════════════════════════
+           BOTÃO FLUTUANTE "COMO FUNCIONA"
+        ════════════════════════════════════════════════════ */
+        .help-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 16px;
+            background: var(--navy-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+            backdrop-filter: blur(8px);
+        }
+        .help-btn:hover {
+            border-color: rgba(232,160,48,0.4);
+            color: var(--amber);
+            background: var(--amber-glow);
+        }
+        /* Botão de alternância de tema */
+        .theme-toggle {
+    position: fixed;
+    top: 14px;
+    right: 20px;
+    z-index: 150;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 14px;
+    background: var(--navy-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--text-secondary);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    backdrop-filter: blur(8px);
+}
+.theme-toggle:hover {
+    border-color: rgba(232,160,48,0.4);
+    color: var(--amber);
+    background: var(--amber-glow);
+}
+@media (max-width: 520px) {
+    .theme-toggle {
+        padding: 7px 10px;
+        font-size: 12px;
+        top: 10px;
+        right: 12px;
+    }
+    .theme-toggle #tema-label { display: none; }
+}
+        /* ════════════════════════════════════════════════════
+           RESPONSIVO MOBILE
+        ════════════════════════════════════════════════════ */
+        @media (max-width: 520px) {
+            .navbar-inner { padding: 0 12px; }
+            .nav-brand { font-size: 1rem; margin-right: 12px; }
+            .nav-tab { padding: 16px 10px; font-size: 0.78rem; }
+            .main { padding: 28px 14px 80px; }
+            .hero h1 { font-size: 2rem; }
+            .btn-row { flex-direction: column; }
+            .result-card-body { padding: 16px; }
+            .result-actions { padding: 12px 16px; }
+            .combo-trigger-btn { margin: 12px 16px 16px; width: calc(100% - 32px); }
+            .combo-card { margin: 0 16px 16px; }
+            .fav-grid, .watched-grid { grid-template-columns: 1fr; }
+        }
+        .nav-tab { position: relative; padding-right: 22px; }
+.nav-badge {
+    position: absolute;
+    top: 8px;
+    right: 2px;
+    margin-left: 0;
+}
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+        /* Correção do bug de renderização travada inicial */
+        #intro-screen {
+            will-change: opacity, visibility;
+        }
+    /* ════ MODO DE VOZ ════ */
+.voice-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+}
+.btn-voice {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 18px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.04);
+    color: var(--text-secondary);
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    flex-shrink: 0;
+}
+.btn-voice:hover {
+    border-color: rgba(232,160,48,0.5);
+    color: var(--amber);
+    background: var(--amber-glow);
+}
+.btn-voice.recording {
+    border-color: #e74c3c;
+    color: #e74c3c;
+    background: rgba(231,76,60,0.1);
+    animation: pulse-rec 1.2s ease-in-out infinite;
+}
+@keyframes pulse-rec {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(231,76,60,0.3); }
+    50%       { box-shadow: 0 0 0 6px rgba(231,76,60,0); }
+}
+.voice-status {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+.voice-status.listening { color: #e74c3c; }
+.voice-status.done      { color: #4caf50; }
+.voice-not-supported {
+    font-size: 12px;
+    color: var(--red-accent);
+    padding: 8px 12px;
+    background: var(--red-dim);
+    border-radius: var(--radius-sm);
+}
+        /* ════ TOAST DE NOTIFICAÇÃO ════ */
+#toast-notif {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1a1f2a;
+    border: 1px solid rgba(232,160,48,0.5);
+    border-left: 3px solid var(--amber);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 30px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    z-index: 9000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+#toast-notif.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+body.light-mode #toast-notif {
+    background: #fff8ef;
+    border-color: rgba(180,100,0,0.4);
+    border-left-color: #b46400;
+    color: #1a1208;
+}
+        .btn-spinner {
+    width: 13px; height: 13px;
+    border: 2px solid rgba(255,255,255,0.35);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    display: inline-block;
+    animation: spin 0.7s linear infinite;
+    margin-right: 6px;
+    vertical-align: -2px;
+}
+    </style>
+</head>
+<body>
+<!-- ═══════════════════════════════════════
+     TELA INTRO CINEMATOGRÁFICA
+════════════════════════════════════════ -->
+<div id="intro-screen" role="presentation" aria-hidden="true">
+    <div class="intro-logo">
+        <div class="mark">Cine<span>Mind</span></div>
+        <div class="intro-line"></div>
+        <div class="tagline">Sua IA de Cinema Premium</div>
+    </div>
+</div>
+<!-- Efeito de luz ambiente -->
+<div class="ambient" aria-hidden="true"></div>
+<!-- Vinheta de penumbra (acompanha o dimming das arandelas) -->
+<div class="room-dim-overlay" aria-hidden="true"></div>
+<!-- ═══════════════════════════════════════
+     ARANDELAS DE LUZ LATERAL
+     - As 4 originais (top/bottom dos dois lados) ficam sempre visíveis.
+     - As 4 NOVAS (.sconce-extra) começam invisíveis (opacity:0) e só
+       aparecem quando a classe "extra-visible" é adicionada ao
+       container pai (.cinema-sconces) — isso acontece via JS no
+       momento em que o result-card é exibido (site "estende" para baixo).
+════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════
+     LUZES DE CANTO — brilho dourado saindo
+     das bordas da tela como cinema premium
+════════════════════════════════════════ -->
+<div class="corner-lights" aria-hidden="true">
+    <div class="corner-light corner-tl"></div>
+    <div class="corner-light corner-tr"></div>
+    <div class="corner-light corner-bl"></div>
+    <div class="corner-light corner-br"></div>
+</div>
+<!-- ═══════════════════════════════════════
+     NAVBAR COM ABAS
+════════════════════════════════════════ -->
+<nav class="navbar content-reveal" ...>
+    <div class="navbar-inner">
+        <span class="nav-brand">CineMind 🎬</span>
+        <div class="nav-tabs" role="tablist">
+            <button class="nav-tab active" role="tab" aria-selected="true"  data-tab="inicio">Início</button>
+            <button class="nav-tab"         role="tab" aria-selected="false" data-tab="combo">Combo Montar</button>
+            <button class="nav-tab"         role="tab" aria-selected="false" data-tab="historico">
+                Histórico<span class="nav-badge" id="badge-historico" style="display:none">0</span>
+            </button>
+            <button class="nav-tab"         role="tab" aria-selected="false" data-tab="favoritos">
+                Favoritos<span class="nav-badge" id="badge-favoritos" style="display:none">0</span>
+            </button>
+            <button class="nav-tab"         role="tab" aria-selected="false" data-tab="top10">Top 10</button>
+        </div>
+    </div>
+</nav>
+<!-- ═══════════════════════════════════════
+     CONTEÚDO PRINCIPAL
+════════════════════════════════════════ -->
+<main class="main content-reveal">
+    <!-- ─── ABA: INÍCIO ─── -->
+    <section class="tab-panel active" id="panel-inicio" role="tabpanel">
+        <div class="hero">
+            <div class="hero-eyebrow">Recomendação com IA</div>
+            <h1>O que você vai<br>assistir hoje?</h1>
+            <p class="hero-subtitle">Conte seu humor, o que você sente vontade de ver — e nossa IA encontra o título perfeito do catálogo para você.</p>
+        </div>
+        <form class="search-form" id="search-form" novalidate>
+            <div class="mood-tags" id="mood-tags">
+    <button type="button" class="mood-tag" data-text="Quero um clássico cult, daqueles que marcaram época">🍿 Clássico Cult</button>
+    <button type="button" class="mood-tag" data-text="Quero algo que exploda minha mente, com reviravoltas e teorias complexas">🧠 Explodir a Mente</button>
+    <button type="button" class="mood-tag" data-text="Quero um terror tenso, daqueles que deixam a gente no limite">😱 Terror Tenso</button>
+    <button type="button" class="mood-tag" data-text="Quero algo leve e tranquilo só para relaxar">🛋️ Para Relaxar</button>
+</div>
+            <div class="input-wrapper">
+                <textarea
+                    class="search-input"
+                    id="pedido"
+                    placeholder="Ex: Quero algo emocionante com reviravoltas, tipo suspense psicológico..."
+                    rows="3"
+                    aria-label="Descreva o que você quer assistir"
+                ></textarea>
+                <button type="button" class="btn-voice-inline" id="btn-voice" aria-label="Usar microfone">
+                    🎙️ Voz
+                </button>
+            </div>
+            <div class="voice-row">
+                <span class="voice-status" id="voice-status"></span>
+            </div>
+            <div class="btn-row">
+                <button type="submit" class="btn btn-primary" id="btn-buscar">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    Buscar Recomendação
+                </button>
+                <button type="button" class="btn btn-ghost" id="btn-surpresa">
+    <span class="dice-emoji">🎲</span> Surpreenda-me
+</button>
+            </div>
+        </form>
+        <!-- Loading -->
+        <div class="loading-box" id="loading-box">
+            <div class="spinner"></div>
+            <span id="loading-text">Nossa IA está vasculhando o catálogo...</span>
+        </div>
+        <!-- Resultado da recomendação -->
+        <div class="result-card" id="result-card">
+            <div class="result-card-header">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3a1f00" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>Recomendação CineMind</span>
+            </div>
+            <div class="result-card-body" id="result-body"></div>
+            <div class="result-actions" id="result-actions">
+                <button class="action-btn" id="btn-fav" title="Adicionar aos favoritos">❤️ Favoritar</button>
+                <button class="action-btn" id="btn-watched" title="Marcar como assistido">✅ Já assisti</button>
+            </div>
+            <!-- Botão de solicitar combo -->
+            <button class="combo-trigger-btn" id="btn-pedir-combo">
+                🥤🍔 Deseja uma sugestão de combo de lanche para acompanhar?
+            </button>
+            <!-- Combo revelado sob demanda -->
+            <div class="combo-card" id="combo-card">
+                <div id="combo-body"></div>
+            </div>
+        </div>
+    </section>
+    <!-- ─── ABA: COMBO MONTAR ─── -->
+    <section class="tab-panel" id="panel-combo" role="tabpanel">
+        <div class="section-header">
+            <h2>Montar Combo 🍿</h2>
+            <p>Já sabe o que vai assistir? Digite o nome do filme ou série e nossa IA cria o combo de lanche perfeito para você.</p>
+        </div>
+        <form class="search-form" id="combo-form" novalidate>
+            <div class="input-wrapper">
+                <textarea
+                    class="search-input"
+                    id="filme-escolhido"
+                    placeholder="Ex: Interstellar, Stranger Things, O Poderoso Chefão..."
+                    rows="2"
+                    aria-label="Nome do filme ou série"
+                ></textarea>
+                <button type="button" class="btn-voice-inline" id="btn-voice-combo" aria-label="Usar microfone">
+                    🎙️ Voz
+                </button>
+            </div>
+            <div class="voice-row">
+                <span class="voice-status" id="voice-status-combo"></span>
+            </div>
+            <div class="btn-row">
+                <button type="submit" class="btn btn-primary">
+                    🍔 Montar meu Combo
+                </button>
+            </div>
+        </form>
+        <div class="loading-box" id="loading-combo">
+            <div class="spinner"></div>
+            <span>Criando o combo perfeito para você...</span>
+        </div>
+        <div class="result-card" id="combo-result-card">
+            <div class="result-card-header">
+                <span>🍿 Seu Combo Especial</span>
+            </div>
+            <div class="result-card-body" id="combo-result-body"></div>
+        </div>
+    </section>
+    <!-- ─── ABA: HISTÓRICO ─── -->
+    <section class="tab-panel" id="panel-historico" role="tabpanel">
+        <div class="section-header">
+            <h2>Histórico 🕐</h2>
+            <p>Todas as recomendações que a nossa IA gerou para você nesta sessão.</p>
+        </div>
+        <!-- Barra de ações do histórico: só aparece quando há itens -->
+        <div id="history-actions-bar" style="display:none; justify-content:flex-end; margin-bottom:12px;">
+            <button onclick="clearAllHistory()" style="
+                padding:7px 16px; border-radius:20px;
+                border:1px solid rgba(231,76,60,0.4);
+                background:rgba(231,76,60,0.08);
+                color:#e06060; font-family:'Inter',sans-serif;
+                font-size:12.5px; font-weight:600; cursor:pointer;
+                transition:all 0.25s ease;
+            "
+            onmouseover="this.style.background='rgba(231,76,60,0.18)'"
+            onmouseout="this.style.background='rgba(231,76,60,0.08)'">
+                🗑️ Apagar tudo
+            </button>
+        </div>
+        <div class="history-list" id="history-list"></div>
+        <div class="empty-state" id="history-empty">
+            <div class="icon">🎬</div>
+            <p>Nenhuma recomendação ainda. Volte para o Início e peça sua primeira sugestão!</p>
+        </div>
+    </section>
+    <!-- ─── ABA: FAVORITOS & ASSISTIDOS ─── -->
+    <section class="tab-panel" id="panel-favoritos" role="tabpanel">
+        <div class="section-header">
+            <h2>Sua Coleção ❤️</h2>
+            <p>Filmes e séries que você salvou durante suas sessões.</p>
+        </div>
+        <div class="section-tabs">
+            <button class="section-tab active" data-subtab="favs">❤️ Favoritos</button>
+            <button class="section-tab" data-subtab="watched">✅ Assistidos</button>
+        </div>
+        <div id="subtab-favs">
+            <div class="fav-grid" id="fav-grid"></div>
+            <div class="empty-state" id="fav-empty">
+                <div class="icon">❤️</div>
+                <p>Nenhum favorito ainda. Clique em "Favoritar" em uma recomendação para salvar aqui.</p>
+            </div>
+        </div>
+        <div id="subtab-watched" style="display:none">
+            <div class="watched-grid" id="watched-grid"></div>
+            <div class="empty-state" id="watched-empty">
+                <div class="icon">✅</div>
+                <p>Nenhum título marcado como assistido ainda.</p>
+            </div>
+        </div>
+    </section>
+    <!-- ─── ABA: TOP 10 ─── -->
+    <section class="tab-panel" id="panel-top10" role="tabpanel">
+        <div class="section-header">
+            <h2>Top 10 do seu Cinema 🏆</h2>
+            <p>Os títulos que você mais favoritou ou marcou como assistido, em ordem de popularidade pessoal.</p>
+        </div>
+        <div class="top10-list" id="top10-list"></div>
+        <div class="empty-state" id="top10-empty">
+            <div class="icon">🏆</div>
+            <p>Seu ranking está vazio. Favorite e marque títulos para montar seu Top 10 pessoal!</p>
+        </div>
+    </section>
+</main>
+<!-- ═══════════════════════════════════════
+     BOTÃO FLUTUANTE AJUDA
+════════════════════════════════════════ -->
+<!-- Botão alternância de tema -->
+<button class="theme-toggle" id="btn-tema" aria-label="Alternar modo claro/escuro">
+    <span id="tema-icon">☀️</span>
+    <span id="tema-label">Modo Claro</span>
+</button>
+<button class="help-btn" id="btn-ajuda" aria-haspopup="true" aria-controls="drawer-ajuda" aria-expanded="false">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 1 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg>
+    Como funciona?
+</button>
+<!-- ═══════════════════════════════════════
+     DRAWER COMO FUNCIONA
+════════════════════════════════════════ -->
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<aside class="drawer" id="drawer-ajuda" role="dialog" aria-modal="true" aria-labelledby="drawer-titulo">
+    <div class="drawer-head">
+        <h2 id="drawer-titulo">Como o CineMind funciona?</h2>
+        <button class="drawer-close" id="drawer-close" aria-label="Fechar">×</button>
+    </div>
+    <div class="how-step">
+        <div class="how-num">1</div>
+        <div class="how-text">
+            <h3>Você nos conta seu humor do momento</h3>
+            <p>É só escrever com suas próprias palavras o que você está com vontade de ver — "algo leve pra rir", "um suspense que prende", "série de fantasia épica". Sem complicações!</p>
+        </div>
+    </div>
+    <div class="how-step">
+        <div class="how-num">2</div>
+        <div class="how-text">
+            <h3>Nossa IA vasculha o catálogo por você</h3>
+            <p>Temos centenas de filmes e séries organizados. A inteligência artificial do Google analisa tudo e encontra o título que mais combina com o que você quer.</p>
+        </div>
+    </div>
+    <div class="how-step">
+        <div class="how-num">3</div>
+        <div class="how-text">
+            <h3>Você recebe a recomendação perfeita</h3>
+            <p>Além de indicar o título, a IA explica em linguagem simples por que aquele filme ou série foi escolhido especialmente para você.</p>
+        </div>
+    </div>
+    <div class="how-step">
+        <div class="how-num">4</div>
+        <div class="how-text">
+            <h3>Peça o combo de lanche (se quiser!)</h3>
+            <p>Com um clique, a IA também sugere o petisco e a bebida ideais para a sessão. Uma experiência completa de cinema em casa.</p>
+        </div>
+    </div>
+    <div class="how-step">
+        <div class="how-num">5</div>
+        <div class="how-text">
+            <h3>Salve, organize e monte seu ranking</h3>
+            <p>Favorite os títulos que amou, marque o que já assistiu e veja seu Top 10 pessoal crescer com o tempo. Tudo salvo no seu navegador, sem criar conta.</p>
+        </div>
+    </div>
+</aside>
+<!-- VLibras (acessibilidade em Libras) -->
+<div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+        <div class="vw-plugin-top-wrapper"></div>
+    </div>
+</div>
+<div id="toast-notif"></div>
+<script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+<script>new window.VLibras.Widget('https://vlibras.gov.br/app');</script>
+<!-- ═══════════════════════════════════════
+     JAVASCRIPT PRINCIPAL
+════════════════════════════════════════ -->
+<script>
+/* ────────────────────────────────────────────────────────
+   <script>
+/* ────────────────────────────────────────────────────────
+   INTRO CINEMATOGRÁFICA (4 segundos)
+──────────────────────────────────────────────────────── */
+(function() {
+    const intro = document.getElementById('intro-screen');
+    setTimeout(() => {
+    document.querySelectorAll('.content-reveal').forEach(el => el.classList.add('revealed'));
+}, 3400);
+    setTimeout(() => {
+        intro.classList.add('hidden');
+    }, 4000);
+})();
+/* ────────────────────────────────────────────────────────
+   STORAGE — Helpers para localStorage
+──────────────────────────────────────────────────────── */
+const Store = {
+    get: (key) => {
+        try { return JSON.parse(localStorage.getItem(key)) || []; }
+        catch { return []; }
+    },
+    set: (key, val) => {
+        try { localStorage.setItem(key, JSON.stringify(val)); }
+        catch {}
+    }
+};
+/* ────────────────────────────────────────────────────────
+   ESTADO DA SESSÃO ATUAL
+──────────────────────────────────────────────────────── */
+let currentTitle = '';
+let currentFaved = false;
+let currentWatched = false;
+/* ────────────────────────────────────────────────────────
+   ARANDELAS LATERAIS
+──────────────────────────────────────────────────────── */
+window.addEventListener('resize', updateSconcesHeight);
+window.addEventListener('load', updateSconcesHeight);
+/* ────────────────────────────────────────────────────────
+   UTILITÁRIOS
+──────────────────────────────────────────────────────── */
+function fmt(text) {
+    return text
+        .replace(/\n/g, '<br>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+}
+function extractTitle(text) {
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (!line.startsWith('**') && line.length > 2 && i > 0) {
+            return line.split('(')[0].trim();
+        }
+    }
+    return lines[1] ? lines[1].replace(/\*\*/g, '').split('(')[0].trim() : 'Título';
+}
+function relTime(ts) {
+    const diff = Date.now() - ts;
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return 'Agora há pouco';
+    if (m < 60) return `há ${m} min`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `há ${h}h`;
+    return `há ${Math.floor(h/24)} dias`;
+}
+/* ────────────────────────────────────────────────────────
+   SISTEMA DE ABAS
+──────────────────────────────────────────────────────── */
+document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        const target = tab.dataset.tab;
+        document.querySelectorAll('.nav-tab').forEach(t => {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+        });
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        document.getElementById('panel-' + target).classList.add('active');
+        if (target === 'historico') renderHistory();
+        if (target === 'favoritos') renderFavs();
+        if (target === 'top10') renderTop10();
+        setTimeout(updateSconcesHeight, 50);
+    });
+});
+document.querySelectorAll('.section-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const sub = tab.dataset.subtab;
+        document.getElementById('subtab-favs').style.display    = sub === 'favs'    ? '' : 'none';
+        document.getElementById('subtab-watched').style.display  = sub === 'watched' ? '' : 'none';
+        renderFavs();
+    });
+});
+/* ────────────────────────────────────────────────────────
+   EXIBIR RESULTADO E BADGES STREAMING
+──────────────────────────────────────────────────────── */
+function showResult(text) {
+    const card = document.getElementById('result-card');
+    const body = document.getElementById('result-body');
+    const comboBtn = document.getElementById('btn-pedir-combo');
+    let conteudo = text;
+    const plataformas = ["Netflix", "Max", "Prime Video", "Disney+", "Apple TV+", "Paramount+"];
+    plataformas.forEach(p => {
+        if (conteudo.includes(p)) {
+            let classeCores = "";
+            if(p==="Netflix") classeCores = "background:#e50914; color:white;";
+            else if(p==="Max") classeCores = "background:#00439C; color:white;";
+            else if(p==="Prime Video") classeCores = "background:#00A8E1; color:white;";
+            else if(p==="Disney+") classeCores = "background:#113CCF; color:white;";
+            else if(p==="Apple TV+") classeCores = "background:#000000; color:white;";
+            else if(p==="Paramount+") classeCores = "background:#0057B8; color:white;";
+            conteudo = conteudo.replace(p, `<span style="${classeCores} padding:2px 8px; border-radius:4px; font-size:12px; margin-right:4px; font-weight: bold;">${p}</span>`);
+        }
+    });
+    const finalHtml = fmt(conteudo);
+    card.style.display = 'block';
+    // Reseta combo
+    comboBtn.classList.add('visible');
+    comboBtn.disabled = false;
+    comboBtn.textContent = '🥤🍔 Deseja uma sugestão de combo de lanche para acompanhar?';
+    document.getElementById('combo-card').classList.remove('visible');
+    currentTitle = extractTitle(text);
+    // Sincroniza o estado visual de favorito/assistido com o que já existe
+    // no localStorage DESTE APARELHO para o título atual. Sem isso, o
+    // estado (favoritado/assistido) do card anterior "vazava" para o novo,
+    // fazendo o botão enviar add/remove errado para o back-end.
+    const favsAtuais = Store.get('favs');
+    const watchedAtuais = Store.get('watched');
+    currentFaved = favsAtuais.some(f => f.title === currentTitle);
+    currentWatched = watchedAtuais.some(w => w.title === currentTitle);
+    const btnFavSync = document.getElementById('btn-fav');
+    const btnWatchedSync = document.getElementById('btn-watched');
+    btnFavSync.classList.toggle('active-fav', currentFaved);
+    btnFavSync.textContent = currentFaved ? '❤️ Favoritado' : '❤️ Favoritar';
+    btnWatchedSync.classList.toggle('active-watched', currentWatched);
+    btnWatchedSync.textContent = currentWatched ? '✅ Assistido!' : '✅ Já assisti';
+    addToHistory(currentTitle, text);
+    setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+    typewriterRender(body, finalHtml, () => showConfirmation(text));
+}
+function typewriterRender(el, html, onDone) {
+    const tokens = html.split(/(<[^>]+>|\s+)/).filter(t => t !== '');
+    el.innerHTML = '';
+    let i = 0;
+    const speed = tokens.length > 120 ? 4 : 2;
+    const interval = setInterval(() => {
+        for (let k = 0; k < speed && i < tokens.length; k++, i++) {
+            el.innerHTML += tokens[i];
+        }
+        // AUTO-SCROLL: rola suavemente para o fim do card enquanto escreve
+        const card = document.getElementById('result-card');
+        if (card) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+        if (i >= tokens.length) {
+            clearInterval(interval);
+            updateSconcesHeight();
+            if (typeof onDone === 'function') onDone();
+        }
+    }, 18);
+}
+/* ────────────────────────────────────────────────────────
+   BUSCA PRINCIPAL (RESTAURADA LIGAÇÃO COM BACK-END)
+──────────────────────────────────────────────────────── */
+document.getElementById('search-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const pedido = document.getElementById('pedido').value.trim();
+    if (!pedido) { document.getElementById('pedido').focus(); return; }
+    const btn = document.getElementById('btn-buscar');
+    setButtonLoading(btn, true, 'Buscando...');
+    await fetchRecomendacao('/recomendar', { pedido: pedido });
+    setButtonLoading(btn, false);
+});
+document.getElementById('btn-surpresa').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    setButtonLoading(btn, true, 'Sorteando...');
+    await fetchRecomendacao('/surpresa', {});
+    setButtonLoading(btn, false);
+});
+document.querySelectorAll('.mood-tag').forEach(tag => {
+    tag.addEventListener('click', () => {
+        const input = document.getElementById('pedido');
+        input.value = tag.dataset.text;
+        input.focus();
+    });
+});
+async function fetchRecomendacao(url, bodyData) {
+    const loading = document.getElementById('loading-box');
+    const loadingText = document.getElementById('loading-text');
+    const card = document.getElementById('result-card');
+    loadingText.textContent = url === '/surpresa'
+        ? 'Girando a roleta do cinema... 🎲'
+        : 'Nossa IA está vasculhando o catálogo...';
+    loading.classList.add('active');
+    card.style.display = 'none';
+    try {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bodyData)
+        });
+        const data = await res.json();
+        showResult(data.recomendacao);
+    } catch {
+        document.getElementById('result-body').innerHTML = '❌ Erro ao conectar com o servidor. Tente novamente.';
+        card.style.display = 'block';
+    } finally {
+        loading.classList.remove('active');
+    }
+}
+/* ────────────────────────────────────────────────────────
+   BOTÃO PEDIR COMBO (RESTAURADA LIGAÇÃO COM BACK-END)
+──────────────────────────────────────────────────────── */
+document.getElementById('btn-pedir-combo').addEventListener('click', async () => {
+    const comboBtn = document.getElementById('btn-pedir-combo');
+    const comboCard = document.getElementById('combo-card');
+    const comboBody = document.getElementById('combo-body');
+    setButtonLoading(comboBtn, true, 'Preparando seu combo... 🍿');
+    try {
+        const res = await fetch('/combo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ titulo: currentTitle })
+        });
+        const data = await res.json();
+        comboBody.innerHTML = fmt(data.combo);
+        comboCard.classList.add('visible');
+        comboBtn.classList.remove('visible');
+        saveComboToHistory(data.combo);
+        setTimeout(updateSconcesHeight, 450);
+    } catch {
+        comboBody.innerHTML = '❌ Erro ao gerar o combo. Tente novamente.';
+        comboCard.classList.add('visible');
+        setButtonLoading(comboBtn, false);
+        comboBtn.classList.add('visible');
+    }
+});
+/* ────────────────────────────────────────────────────────
+   AÇÕES: FAVORITAR / MARCAR ASSISTIDO
+──────────────────────────────────────────────────────── */
+function showToast(msg) {
+    const toast = document.getElementById('toast-notif');
+    toast.innerHTML = msg;
+    toast.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+document.getElementById('btn-fav').addEventListener('click', async () => {
+    if (!currentTitle) return;
+    const btn = document.getElementById('btn-fav');
+    const novoEstado = !currentFaved;
+    setButtonLoading(btn, true);
+    try {
+        await fetch('/favoritar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ titulo: currentTitle, acao: novoEstado ? 'add' : 'remove' })
+        });
+        currentFaved = novoEstado;
+        const favs = Store.get('favs');
+        if (currentFaved) {
+            if (!favs.find(f => f.title === currentTitle)) {
+                favs.unshift({ title: currentTitle, ts: Date.now(), count: 1 });
+            }
+            showToast('❤️ <strong>' + escapeHtml(currentTitle) + '</strong> adicionado aos favoritos!');
+        } else {
+            const idx = favs.findIndex(f => f.title === currentTitle);
+            if (idx > -1) favs.splice(idx, 1);
+            showToast('🗑️ Removido dos favoritos.');
+        }
+        Store.set('favs', favs);
+        updateBadges();
+    } catch {
+        showToast('❌ Não foi possível atualizar. Tente novamente.');
+    } finally {
+        setButtonLoading(btn, false);
+        btn.classList.toggle('active-fav', currentFaved);
+        btn.textContent = currentFaved ? '❤️ Favoritado' : '❤️ Favoritar';
+        if (currentFaved) {
+            btn.classList.remove('pop-fav');
+            void btn.offsetWidth;
+            btn.classList.add('pop-fav');
+        }
+    }
+});
+document.getElementById('btn-watched').addEventListener('click', () => {
+    if (!currentTitle) return;
+    currentWatched = !currentWatched;
+    const btn = document.getElementById('btn-watched');
+    btn.classList.toggle('active-watched', currentWatched);
+    btn.textContent = currentWatched ? '✅ Assistido!' : '✅ Já assisti';
+    const watched = Store.get('watched');
+    if (currentWatched) {
+        if (!watched.find(w => w.title === currentTitle)) {
+            watched.unshift({ title: currentTitle, ts: Date.now() });
+        }
+    } else {
+        const idx = watched.findIndex(w => w.title === currentTitle);
+        if (idx > -1) watched.splice(idx, 1);
+    }
+    Store.set('watched', watched);
+    updateBadges();
+});
+/* ────────────────────────────────────────────────────────
+   ABA COMBO MONTAR (RESTAURADA LIGAÇÃO COM BACK-END)
+──────────────────────────────────────────────────────── */
+document.getElementById('combo-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const filmeInput = document.getElementById('filme-escolhido').value.trim();
+    if (!filmeInput) { document.getElementById('filme-escolhido').focus(); return; }
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const loading = document.getElementById('loading-combo');
+    const card = document.getElementById('combo-result-card');
+    const body = document.getElementById('combo-result-body');
+    setButtonLoading(submitBtn, true, 'Montando...');
+    loading.classList.add('active');
+    card.style.display = 'none';
+    try {
+        const res = await fetch('/montar-combo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filme: filmeInput })
+        });
+        const data = await res.json();
+        body.innerHTML = fmt(data.combo);
+        card.style.display = 'block';
+        setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+        setTimeout(updateSconcesHeight, 450);
+    } catch {
+        body.innerHTML = '❌ Erro ao gerar o combo. Tente novamente.';
+        card.style.display = 'block';
+    } finally {
+        loading.classList.remove('active');
+        setButtonLoading(submitBtn, false);
+    }
+});
+/* ────────────────────────────────────────────────────────
+   HISTÓRICO
+──────────────────────────────────────────────────────── */
+function addToHistory(title, fullText) {
+    const history = Store.get('history');
+    // combo começa vazio; será preenchido por saveComboToHistory()
+    history.unshift({ title, fullText, combo: '', ts: Date.now() });
+    if (history.length > 30) history.pop();
+    Store.set('history', history);
+    updateBadges();
+}
+// Chame esta função quando o combo for gerado para salvar no histórico
+function saveComboToHistory(comboText) {
+    const history = Store.get('history');
+    if (history.length > 0) {
+        history[0].combo = comboText; // salva no item mais recente
+        Store.set('history', history);
+    }
+}
+function renderHistory() {
+    const history = Store.get('history');
+    const list = document.getElementById('history-list');
+    const empty = document.getElementById('history-empty');
+    const actionsBar = document.getElementById('history-actions-bar');
+    if (!history.length) {
+        list.innerHTML = '';
+        empty.style.display = 'block';
+        // Esconde a barra de ações quando não há itens
+        if (actionsBar) actionsBar.style.display = 'none';
+        return;
+    }
+    empty.style.display = 'none';
+    // Mostra a barra de ações com o botão "Apagar tudo"
+    if (actionsBar) actionsBar.style.display = 'flex';
+    list.innerHTML = history.map((item, i) => `
+        <div class="history-item" style="cursor:pointer;" title="Clique para ver detalhes">
+            <div class="history-num" onclick="openHistoryModal(${i})">${i + 1}</div>
+            <div class="history-info" onclick="openHistoryModal(${i})">
+                <div class="history-title">${escapeHtml(item.title)}</div>
+                <div class="history-time">${relTime(item.ts)} ${item.combo ? '· 🍿 Combo salvo' : ''}</div>
+            </div>
+            <span onclick="openHistoryModal(${i})" style="color:var(--amber);font-size:18px;flex-shrink:0;padding:0 4px;">›</span>
+            <button onclick="event.stopPropagation(); removeHistoryItem(${i})" style="
+                background:none; border:none; cursor:pointer;
+                color:var(--text-muted); font-size:13px;
+                padding:4px 6px; border-radius:6px;
+                font-family:'Inter',sans-serif;
+                transition:color 0.2s ease;
+                flex-shrink:0;
+            "
+            onmouseover="this.style.color='#e06060'"
+            onmouseout="this.style.color='var(--text-muted)'"
+            title="Remover este item">✕</button>
+        </div>
+    `).join('');
+}
+function openHistoryModal(index) {
+    const history = Store.get('history');
+    const item = history[index];
+    if (!item) return;
+    // Cria o modal dinamicamente
+    const existing = document.getElementById('history-modal');
+    if (existing) existing.remove();
+    const modal = document.createElement('div');
+    modal.id = 'history-modal';
+    modal.style.cssText = `
+        position:fixed; inset:0; z-index:300;
+        background:rgba(0,0,0,0.75); backdrop-filter:blur(4px);
+        display:flex; align-items:center; justify-content:center;
+        padding:20px;
+    `;
+    const comboSection = item.combo ? `
+        <div style="margin-top:20px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.1);">
+            <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;
+                        color:var(--amber);margin-bottom:10px;">🍿 Combo gerado</div>
+            <div style="font-size:14px;line-height:1.75;color:var(--text-primary);">${fmt(item.combo)}</div>
+        </div>
+    ` : '';
+    modal.innerHTML = `
+        <div style="
+            background:#161b24; border:1px solid rgba(255,255,255,0.1);
+            border-radius:16px; width:100%; max-width:640px;
+            max-height:85vh; overflow-y:auto; position:relative;
+        ">
+            <div style="
+                background:var(--amber); padding:12px 20px;
+                border-radius:16px 16px 0 0;
+                display:flex; align-items:center; justify-content:space-between;
+            ">
+                <span style="font-size:13px;font-weight:700;letter-spacing:0.1em;
+                             text-transform:uppercase;color:#3a1f00;">
+                    ⭐ ${escapeHtml(item.title)}
+                </span>
+                <button onclick="document.getElementById('history-modal').remove()"
+                    style="background:rgba(0,0,0,0.2);border:none;border-radius:50%;
+                           width:28px;height:28px;color:#3a1f00;font-size:16px;
+                           cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                    ×
+                </button>
+            </div>
+            <div style="padding:20px 24px;">
+                <div style="font-size:11px;color:var(--text-muted);margin-bottom:14px;">
+                    ${relTime(item.ts)}
+                </div>
+                <div style="font-size:15px;line-height:1.75;color:var(--text-primary);">
+                    ${fmt(item.fullText)}
+                </div>
+                ${comboSection}
+            </div>
+        </div>
+    `;
+    // Fecha ao clicar fora do card
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+    document.body.appendChild(modal);
+}
+/* ────────────────────────────────────────────────────────
+   FAVORITOS & ASSISTIDOS
+──────────────────────────────────────────────────────── */
+function renderFavs() {
+    const activeSub = document.querySelector('.section-tab.active')?.dataset.subtab || 'favs';
+    if (activeSub === 'favs') {
+        const favs = Store.get('favs');
+        const grid = document.getElementById('fav-grid');
+        const empty = document.getElementById('fav-empty');
+        if (!favs.length) {
+            grid.innerHTML = '';
+            empty.style.display = 'block';
+            return;
+        }
+        empty.style.display = 'none';
+        grid.innerHTML = favs.map((f, i) => `
+            <div class="media-card">
+                <div class="media-card-title">${escapeHtml(f.title)}</div>
+                <div class="media-card-meta">Salvo ${relTime(f.ts)}</div>
+                <button class="remove-btn" onclick="removeFav(${i})">✕ Remover</button>
+            </div>
+        `).join('');
+    } else {
+        const watched = Store.get('watched');
+        const grid = document.getElementById('watched-grid');
+        const empty = document.getElementById('watched-empty');
+        if (!watched.length) {
+            grid.innerHTML = '';
+            empty.style.display = 'block';
+            return;
+        }
+        empty.style.display = 'none';
+        grid.innerHTML = watched.map((w, i) => `
+            <div class="media-card">
+                <div class="media-card-title">${escapeHtml(w.title)}</div>
+                <div class="media-card-meta">Assistido ${relTime(w.ts)}</div>
+                <button class="remove-btn" onclick="removeWatched(${i})">✕ Remover</button>
+            </div>
+        `).join('');
+    }
+}
+function removeHistoryItem(i) {
+    const history = Store.get('history');
+    history.splice(i, 1);
+    Store.set('history', history);
+    renderHistory();
+    updateBadges();
+    setTimeout(updateSconcesHeight, 50);
+}
+function clearAllHistory() {
+    // Pede confirmação antes de apagar tudo
+    if (!confirm('Tem certeza que quer apagar todo o histórico? Esta ação não pode ser desfeita.')) return;
+    Store.set('history', []);
+    renderHistory();
+    updateBadges();
+    setTimeout(updateSconcesHeight, 50);
+}
+function removeFav(i) {
+    const favs = Store.get('favs');
+    favs.splice(i, 1);
+    Store.set('favs', favs);
+    renderFavs();
+    updateBadges();
+}
+function removeWatched(i) {
+    const watched = Store.get('watched');
+    watched.splice(i, 1);
+    Store.set('watched', watched);
+    renderFavs();
+    updateBadges();
+}
+/* ────────────────────────────────────────────────────────
+   TOP 10
+──────────────────────────────────────────────────────── */
+async function renderTop10() {
+    const empty = document.getElementById('top10-empty');
+    const list  = document.getElementById('top10-list');
+    list.innerHTML = `<div style="text-align:center;padding:30px;"><div class="spinner" style="margin:0 auto;"></div></div>`;
+    empty.style.display = 'none';
+    try {
+        const res = await fetch('/top10-global');
+        const data = await res.json();
+        const sorted = data.top10 || [];
+        if (!sorted.length) {
+            list.innerHTML = '';
+            empty.style.display = 'block';
+            return;
+        }
+        const favs = Store.get('favs');
+        const medals = ['🥇', '🥈', '🥉'];
+        list.innerHTML = sorted.map((item, i) => `
+            <div class="top10-item">
+                <div class="top10-rank">${medals[i] || (i + 1)}</div>
+                <div class="top10-info">
+                    <div class="top10-title">${escapeHtml(item.titulo)}</div>
+                    <div class="top10-count">${item.favoritos} favorito${item.favoritos !== 1 ? 's' : ''} na plataforma${
+                        favs.some(f => f.title === item.titulo) ? ' · ❤️ Você favoritou' : ''
+                    }</div>
+                </div>
+            </div>
+        `).join('');
+    } catch {
+        list.innerHTML = '';
+        empty.style.display = 'block';
+    }
+}
+/* ────────────────────────────────────────────────────────
+   BADGES DE CONTAGEM NAS ABAS
+──────────────────────────────────────────────────────── */
+function updateBadges() {
+    const histCount = Store.get('history').length;
+    const favCount  = Store.get('favs').length + Store.get('watched').length;
+    const bH = document.getElementById('badge-historico');
+    const bF = document.getElementById('badge-favoritos');
+    bH.textContent = histCount;
+    bH.style.display = histCount ? 'inline-flex' : 'none';
+    bF.textContent = favCount;
+    bF.style.display = favCount ? 'inline-flex' : 'none';
+}
+/* ────────────────────────────────────────────────────────
+   ALTERNÂNCIA DE TEMA — Claro / Escuro
+──────────────────────────────────────────────────────── */
+(function() {
+    const btn   = document.getElementById('btn-tema');
+    const icon  = document.getElementById('tema-icon');
+    const label = document.getElementById('tema-label');
+    // Verifica se o usuário já tinha escolhido um tema antes
+    const savedTheme = localStorage.getItem('cinemind-theme');
+    // Também respeita a preferência do sistema operacional
+    const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+    // Aplica o tema salvo ou a preferência do sistema
+    let isLight = savedTheme === 'light' || (!savedTheme && prefersLight);
+    function applyTheme(light) {
+        if (light) {
+            document.body.classList.add('light-mode');
+            icon.textContent  = '🌙';
+            label.textContent = 'Modo Escuro';
+        } else {
+            document.body.classList.remove('light-mode');
+            icon.textContent  = '☀️';
+            label.textContent = 'Modo Claro';
+        }
+    }
+    // Aplica ao carregar
+    applyTheme(isLight);
+    // Alterna ao clicar
+    btn.addEventListener('click', () => {
+        isLight = !isLight;
+        applyTheme(isLight);
+        localStorage.setItem('cinemind-theme', isLight ? 'light' : 'dark');
+    });
+})();
+/* ────────────────────────────────────────────────────────
+   DRAWER "COMO FUNCIONA"
+──────────────────────────────────────────────────────── */
+const btnAjuda    = document.getElementById('btn-ajuda');
+const drawer      = document.getElementById('drawer-ajuda');
+const overlay     = document.getElementById('drawer-overlay');
+const drawerClose = document.getElementById('drawer-close');
+function openDrawer() {
+    drawer.classList.add('open');
+    overlay.classList.add('open');
+    btnAjuda.setAttribute('aria-expanded', 'true');
+}
+function closeDrawer() {
+    drawer.classList.remove('open');
+    overlay.classList.remove('open');
+    btnAjuda.setAttribute('aria-expanded', 'false');
+}
+btnAjuda.addEventListener('click', openDrawer);
+drawerClose.addEventListener('click', closeDrawer);
+overlay.addEventListener('click', closeDrawer);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+/* ────────────────────────────────────────────────────────
+   UTILITÁRIO: ESCAPE HTML (XSS prevention)
+──────────────────────────────────────────────────────── */
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+/* ────────────────────────────────────────────────────────
+   INICIALIZAÇÃO E POSIÇÃO LUZES
+──────────────────────────────────────────────────────── */
+updateBadges();
+updateSconcesHeight();
+function updateSconcesHeight() {
+    // Luzes agora são cantos fixos com CSS puro — nenhum cálculo necessário
+}
+    /* ────────────────────────────────────────────────────────
+   CONFIRMAÇÃO PÓS-GERAÇÃO
+──────────────────────────────────────────────────────── */
+let lastRequestData = null; // guarda os dados do último pedido para poder refazer
+// Sobrescreva fetchRecomendacao para guardar os dados do pedido
+const _originalFetch = fetchRecomendacao;
+function showConfirmation(originalText) {
+    // Remove qualquer confirmação anterior
+    const old = document.getElementById('confirm-box');
+    if (old) old.remove();
+    const box = document.createElement('div');
+    box.id = 'confirm-box';
+    box.style.cssText = `
+        margin-top:16px; padding:16px 20px;
+        background:#161b24; border:1px solid rgba(232,160,18,0.3);
+        border-radius:12px; animation: rise 0.35s ease;
+    `;
+    box.innerHTML = `
+        <p style="font-size:14px;color:var(--text-primary);margin-bottom:12px;">
+            🎯 <strong style="color:var(--amber);">Essa recomendação foi o que você queria?</strong>
+        </p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="confirmYes()" style="
+                padding:8px 18px; border-radius:20px; border:none;
+                background:var(--amber); color:#0f1623;
+                font-family:'Inter',sans-serif; font-size:13px;
+                font-weight:700; cursor:pointer;">
+                👍 Sim, perfeito!
+            </button>
+            <button onclick="confirmNo()" style="
+                padding:8px 18px; border-radius:20px;
+                border:1px solid rgba(255,255,255,0.15);
+                background:transparent; color:var(--text-primary);
+                font-family:'Inter',sans-serif; font-size:13px;
+                font-weight:600; cursor:pointer;">
+                👎 Não era bem isso
+            </button>
+        </div>
+        <div id="confirm-feedback" style="display:none; margin-top:14px;">
+            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">
+                O que estava errado? Explique e vou gerar novamente:
+            </p>
+            <div style="position:relative;">
+                <textarea id="confirm-input" style="
+                    width:100%; padding:12px 14px; padding-bottom:44px;
+                    background:#1a1f2a; border:1px solid rgba(255,255,255,0.1);
+                    border-radius:8px; color:var(--text-primary);
+                    font-family:'Inter',sans-serif; font-size:14px;
+                    resize:none; min-height:72px;
+                " placeholder="Ex: Queria um filme, não uma série. Queria algo mais recente..."></textarea>
+                <button type="button" id="btn-voice-confirm" style="
+                    position:absolute; bottom:10px; right:10px;
+                    display:inline-flex; align-items:center; gap:5px;
+                    padding:6px 12px; border-radius:20px;
+                    border:1px solid rgba(255,255,255,0.08);
+                    background:rgba(20,24,32,0.85);
+                    backdrop-filter:blur(6px);
+                    color:#9aa3b0; font-family:'Inter',sans-serif;
+                    font-size:12px; font-weight:600; cursor:pointer;
+                ">🎙️ Voz</button>
+            </div>
+            <div style="min-height:18px; margin-top:4px;">
+                <span id="voice-status-confirm" style="font-size:12px; font-style:italic; color:#5c6470;"></span>
+            </div>
+            <button onclick="confirmRetry()" style="
+                margin-top:8px; padding:9px 20px;
+                border-radius:20px; border:none;
+                background:var(--amber); color:#0f1623;
+                font-family:'Inter',sans-serif; font-size:13px;
+                font-weight:700; cursor:pointer;">
+                🔄 Gerar novamente com essa observação
+            </button>
+        </div>
+    `;
+    const card = document.getElementById('result-card');
+    card.parentNode.insertBefore(box, card.nextSibling);
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function confirmYes() {
+    const box = document.getElementById('confirm-box');
+    if (box) {
+        box.innerHTML = `<p style="font-size:14px;color:#4caf50;">✅ Ótimo! Aproveite a sessão! 🎬</p>`;
+        setTimeout(() => { if (box) box.remove(); }, 2500);
+    }
+}
+function confirmNo() {
+    const feedback = document.getElementById('confirm-feedback');
+    if (feedback) {
+        feedback.style.display = 'block';
+        document.getElementById('confirm-input').focus();
+    }
+}
+async function confirmRetry() {
+    const input = document.getElementById('confirm-input').value.trim();
+    if (!input) { document.getElementById('confirm-input').focus(); return; }
+    // 1. Remove a caixa de confirmação
+    const box = document.getElementById('confirm-box');
+    if (box) box.remove();
+    // 2. Esconde o card atual para não ficar "fantasma" na tela
+    const card = document.getElementById('result-card');
+    if (card) card.style.display = 'none';
+    // 3. Rola suavemente para o formulário de busca (evita o vazio)
+    const form = document.getElementById('search-form');
+    if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // 4. Monta novo pedido combinando o original + a correção do usuário
+    const pedidoOriginal = document.getElementById('pedido').value.trim();
+    const novoPedido = pedidoOriginal
+        ? `${pedidoOriginal}. Observação importante: ${input}`
+        : input;
+    document.getElementById('pedido').value = novoPedido;
+    // 5. Pequena pausa para o scroll acontecer antes de mostrar o loading
+    await new Promise(r => setTimeout(r, 350));
+    await fetchRecomendacao('/recomendar', { pedido: novoPedido });
+}
+    /* ────────────────────────────────────────────────────────
+   RECONHECIMENTO DE VOZ
+──────────────────────────────────────────────────────── */
+(function() {
+    const btn    = document.getElementById('btn-voice');
+    const status = document.getElementById('voice-status');
+    const input  = document.getElementById('pedido');
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        btn.outerHTML = '<span class="voice-not-supported">🎙️ Voz não suportada (use Chrome)</span>';
+        return;
+    }
+    const rec = new SpeechRecognition();
+    rec.lang = 'pt-BR';
+    rec.interimResults = true;
+    rec.continuous = true;
+    rec.maxAlternatives = 1;
+    let isRecording = false;
+    let finalTranscript = '';
+    btn.addEventListener('click', () => {
+        if (isRecording) {
+            rec.stop();
+        } else {
+            finalTranscript = '';
+            input.value = '';
+            try {
+                rec.start();
+            } catch(err) {
+                status.textContent = '❌ Erro ao iniciar microfone.';
+            }
+        }
+    });
+    rec.onstart = () => {
+        isRecording = true;
+        btn.classList.add('recording');
+        btn.textContent = '⏹️ Parar';
+        status.textContent = '🔴 Ouvindo... fale agora';
+        status.className = 'voice-status listening';
+    };
+    rec.onresult = (e) => {
+        let interim = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+            const t = e.results[i][0].transcript;
+            if (e.results[i].isFinal) {
+                finalTranscript += t + ' ';
+            } else {
+                interim += t;
+            }
+        }
+        input.value = (finalTranscript + interim).trim();
+    };
+    rec.onerror = (e) => {
+        if (e.error === 'no-speech') {
+            status.textContent = '⚠️ Nenhuma fala detectada. Tente novamente.';
+        } else if (e.error === 'not-allowed') {
+            status.textContent = '❌ Permissão de microfone negada.';
+        } else if (e.error === 'aborted') {
+            // ignorado — usuário clicou em parar
+        } else {
+            status.textContent = `❌ Erro: ${e.error}`;
+        }
+        status.className = 'voice-status';
+    };
+    rec.onend = () => {
+        isRecording = false;
+        btn.classList.remove('recording');
+        btn.textContent = '🎙️ Voz';
+        if (finalTranscript.trim()) {
+            status.textContent = '✅ Captado! Revise e clique em Buscar.';
+            status.className = 'voice-status done';
+            input.value = finalTranscript.trim();
+        }
+    };
+})();
+    /* ────────────────────────────────────────────────────────
+   VOZ — CAIXA "NÃO ERA BEM ISSO" (confirm-feedback)
+   Usa MutationObserver pois o botão é criado dinamicamente
+──────────────────────────────────────────────────────── */
+(function() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+    function attachConfirmVoice() {
+        const btn = document.getElementById('btn-voice-confirm');
+        if (!btn || btn._voiceAttached) return;
+        btn._voiceAttached = true;
+        const status = document.getElementById('voice-status-confirm');
+        const input  = document.getElementById('confirm-input');
+        const rec = new SpeechRecognition();
+        rec.lang = 'pt-BR';
+        rec.interimResults = true;
+        rec.continuous = true;
+        let isRecording = false;
+        let finalTranscript = '';
+        btn.addEventListener('click', () => {
+            if (isRecording) { rec.stop(); return; }
+            finalTranscript = '';
+            input.value = '';
+            try { rec.start(); } catch(e) {}
+        });
+        rec.onstart = () => {
+            isRecording = true;
+            btn.style.borderColor = '#e74c3c';
+            btn.style.color = '#e74c3c';
+            btn.textContent = '⏹️ Parar';
+            status.textContent = '🔴 Ouvindo...';
+        };
+        rec.onresult = (e) => {
+            let interim = '';
+            for (let i = e.resultIndex; i < e.results.length; i++) {
+                const t = e.results[i][0].transcript;
+                if (e.results[i].isFinal) finalTranscript += t + ' ';
+                else interim += t;
+            }
+            input.value = (finalTranscript + interim).trim();
+        };
+        rec.onerror = (e) => {
+            if (e.error !== 'aborted') status.textContent = '⚠️ ' + (e.error === 'not-allowed' ? 'Permissão negada.' : 'Tente novamente.');
+        };
+        rec.onend = () => {
+            isRecording = false;
+            btn.style.borderColor = '';
+            btn.style.color = '';
+            btn.textContent = '🎙️ Voz';
+            if (finalTranscript.trim()) {
+                status.textContent = '✅ Captado!';
+                input.value = finalTranscript.trim();
+            }
+        };
+    }
+    // Observa o DOM para detectar quando o botão é criado
+    const observer = new MutationObserver(() => attachConfirmVoice());
+    observer.observe(document.body, { childList: true, subtree: true });
+})();
+/* ────────────────────────────────────────────────────────
+   VOZ — COMBO MONTAR
+──────────────────────────────────────────────────────── */
+(function() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+    const btn    = document.getElementById('btn-voice-combo');
+    const status = document.getElementById('voice-status-combo');
+    const input  = document.getElementById('filme-escolhido');
+    if (!btn) return;
+    const rec = new SpeechRecognition();
+    rec.lang = 'pt-BR';
+    rec.interimResults = true;
+    rec.continuous = true;
+    let isRecording = false;
+    let finalTranscript = '';
+    btn.addEventListener('click', () => {
+        if (isRecording) { rec.stop(); return; }
+        finalTranscript = '';
+        input.value = '';
+        try { rec.start(); } catch(e) {}
+    });
+    rec.onstart = () => {
+        isRecording = true;
+        btn.classList.add('recording');
+        btn.textContent = '⏹️ Parar';
+        status.textContent = '🔴 Ouvindo...';
+        status.className = 'voice-status listening';
+    };
+    rec.onresult = (e) => {
+        let interim = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+            const t = e.results[i][0].transcript;
+            if (e.results[i].isFinal) finalTranscript += t + ' ';
+            else interim += t;
+        }
+        input.value = (finalTranscript + interim).trim();
+    };
+    rec.onerror = (e) => {
+        if (e.error === 'aborted') return;
+        status.textContent = e.error === 'not-allowed' ? '❌ Permissão negada.' : '⚠️ Tente novamente.';
+        status.className = 'voice-status';
+    };
+    rec.onend = () => {
+        isRecording = false;
+        btn.classList.remove('recording');
+        btn.textContent = '🎙️ Voz';
+        if (finalTranscript.trim()) {
+            status.textContent = '✅ Captado!';
+            status.className = 'voice-status done';
+            input.value = finalTranscript.trim();
+        }
+    };
+})();
+    function setButtonLoading(btn, loading, loadingText) {
+    if (loading) {
+        btn.dataset.originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `<span class="btn-spinner"></span>${loadingText || 'Carregando...'}`;
+    } else {
+        btn.disabled = false;
+        if (btn.dataset.originalHtml) btn.innerHTML = btn.dataset.originalHtml;
+    }
+}
+</script>
+</body>
+</html>
