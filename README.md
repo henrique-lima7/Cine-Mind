@@ -20,7 +20,7 @@ Abaixo você pode conferir o fluxo completo da aplicação e como o design premi
 ### 1️⃣ Tela Inicial
 Interface escura com efeitos de luz ambiente adaptativa nas bordas, tags rápidas de humor e sistema integrado de busca por texto ou comando de voz nativo.
 <p align="center">
-  <img width="1024" height="469" alt="image" src="https://github.com/user-attachments/assets/5dda95e5-18ac-4739-a49c-81b66a7fe8cf" />
+  <img width="1905" height="858" alt="image" src="https://github.com/user-attachments/assets/57a320fe-927b-4392-b49e-877be65d37cc" />
 </p>
 
 ### 2️⃣ Geração do Filme com IA
@@ -32,19 +32,19 @@ O sistema exibe o resultado utilizando um efeito dinâmico de digitação (*type
 ### 3️⃣ Menu do Chef — Combo de Comida
 Com um único clique no botão sob demanda, a inteligência artificial analisa o clima específico do filme escolhido e monta um combo gastronômico personalizado com bebida, petisco principal e sobremesa temática.
 <p align="center">
-  <img width="1024" height="472" alt="image" src="https://github.com/user-attachments/assets/ae1b1aba-290f-4bd4-b152-ae3c5ac8c582" />
+  <img width="1910" height="870" alt="image" src="https://github.com/user-attachments/assets/ddb49564-4a50-48c5-99ff-fa14b51564ef" />
 </p>
 
 ### 4️⃣ Histórico da Sessão
 Acompanhe de forma simples tudo o que a IA gerou para você na aba de histórico local. Os itens salvam o horário relativo da busca e se há um combo atrelado àquela sugestão.
 <p align="center">
-  <img width="1024" height="460" alt="image" src="https://github.com/user-attachments/assets/5880b186-5dfe-46e6-9d3b-6c2de4dc369e" />
+  <img width="1902" height="863" alt="image" src="https://github.com/user-attachments/assets/49f3ba78-9182-4236-810a-2ff5583642f2" />
 </p>
 
 ### 5️⃣ Ranking Top 10 Global
 O coração social da plataforma: um painel que exibe dinamicamente os títulos de maior sucesso entre todos que acessam o sistema.
 <p align="center">
-  <img width="1897" height="862" alt="image" src="https://github.com/user-attachments/assets/38c0f6a0-2cf6-424c-b96e-9b21aa2a5628" />
+  <img width="1905" height="858" alt="image" src="https://github.com/user-attachments/assets/3f7df4ba-6b95-4fad-85e9-cfdbcc0fba79" />
 </p>
 
 ---
