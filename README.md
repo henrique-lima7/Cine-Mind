@@ -26,7 +26,7 @@ Interface escura com efeitos de luz ambiente adaptativa nas bordas, tags rápida
 ### 2️⃣ Geração do Filme com IA
 O sistema exibe o resultado utilizando um efeito dinâmico de digitação (*typewriter effect*), destaca as plataformas com as cores oficiais das marcas de streaming e adiciona um painel interativo de feedback para refinar a busca.
 <p align="center">
-  <img width="1023" height="474" alt="image" src="https://github.com/user-attachments/assets/b57b58e9-b2be-4c5d-89e9-5d4bb333d5ab" />
+  <img width="1906" height="872" alt="image" src="https://github.com/user-attachments/assets/6f7cc48b-fcd2-40f3-81a8-02a91ebb81cd" />
 </p>
 
 ### 3️⃣ Menu do Chef — Combo de Comida
