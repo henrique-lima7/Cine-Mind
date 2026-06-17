@@ -1,86 +1,132 @@
-<div align="center">
-  <!-- Badges com as Cores Exatas do Site (Vinho, Âmbar e Preto) -->
-  <img src="https://img.shields.io/badge/Release-Premium_v2.0-f39c12?style=for-the-badge&logo=probot&logoColor=1f0505" alt="CineMind Version">
-  <img src="https://img.shields.io/badge/Ambiente-Velvet_Wine_&_Gold-4a1212?style=for-the-badge" alt="UI Velvet Wine">
-  <img src="https://img.shields.io/badge/AI--Integrated-Google_Gemini-11151c?style=for-the-badge&logo=google-gemini&logoColor=f5f5f5" alt="AI Integrated">
+🎬 CineMind
+<div align="center"> <img src="https://img.shields.io/badge/Status-Online-f39c12?style=for-the-badge"> <img src="https://img.shields.io/badge/IA-Google_Gemini-f39c12?style=for-the-badge"> <img src="https://img.shields.io/badge/Python-Flask-2b0000?style=for-the-badge"> <img src="https://img.shields.io/badge/UI-Cinema_Premium-111827?style=for-the-badge">
 
-  <br><br>
+<br><br>
 
-  <!-- Título Principal com a Identidade CineMind -->
-  <h1>🎬 Cine<span>Mind</span> — Sua IA do Cinema</h1>
-  
-  <p align="center">
-    <strong>Uma aplicação web imersiva de recomendação inteligente e curadoria de lanches movida a Inteligência Artificial.</strong>
-  </p>
+🍷 CineMind — Descubra o que assistir com Inteligência Artificial
+Uma experiência cinematográfica premium que entende seu humor e encontra o filme ou série perfeito para você.
+<br> <img src="https://img.shields.io/badge/Design-Velvet_Wine-f39c12?style=flat-square"> <img src="https://img.shields.io/badge/Experiência-Imersiva-f39c12?style=flat-square"> <img src="https://img.shields.io/badge/IA-Semântica-f39c12?style=flat-square"> </div>
+✨ Visão Geral
 
-  <p align="center">
-    <a href="#-funcionalidades-chave">Funcionalidades</a> •
-    <a href="#-identidade-visual-premium">Design Imersivo</a> •
-    <a href="#-tecnologias-e-arquitetura">Tecnologias</a> •
-    <a href="#-diferenciais-de-engenharia-de-software">Diferenciais Técnicos</a>
-  </p>
-</div>
+O CineMind foi desenvolvido para eliminar a indecisão na hora de escolher um filme ou série.
 
----
+Utilizando Inteligência Artificial Generativa, o sistema interpreta desejos, emoções, gêneros favoritos e referências fornecidas pelo usuário para entregar recomendações personalizadas em segundos.
 
-## 🎭 Sobre o CineMind
+A experiência foi inspirada na atmosfera sofisticada dos cinemas premium, combinando:
 
-O **CineMind** transforma o dilema de escolher o próximo filme em uma experiência de imersão completa. O software compreende o humor, os sentimentos e os desejos do usuário transmitidos em linguagem natural (por digitação ou voz) e realiza uma busca semântica inteligente no catálogo para entregar o título ideal.
+🍷 Tons vinho profundos
 
-### 🎨 Identidade Visual Premium (Fidelidade de Interface)
-Inspirado na atmosfera requintada das salas de cinema e grandes teatros, o design da interface conta com:
-* **Navbar em Vinho Profundo:** Uma barra superior sólida em tom veludo que organiza elegantemente o fluxo de navegação e as contagens dinâmicas.
-* **Penumbra Computacional:** Telas escuras e texturizadas com gradientes pretos e cinza-carvão que reduzem a fadiga ocular e focam o olhar na tela.
-* **Luzes de Arandela Digitais:** Pontos de iluminação âmbar difusa nos cantos que simulam os refletores laterais de uma sala real antes do filme começar.
-* **Cards de Leitura em Creme/Marfim:** Bloco de contraste projetado na cor marfim para garantir uma legibilidade perfeita, clara e polida das respostas da IA.
+🟡 Destaques dourados
 
----
+🤍 Cards elegantes em marfim
 
-## 🚀 Funcionalidades-Chave
+⚫ Fundo escuro cinematográfico
 
-* 🧠 **Busca Semântica por Humor:** O usuário dita o que quer assistir em linguagem natural (ex: *"Quero uma série do estilo The Night Of"*).
-* 🎙️ **Interface de Voz Nativa:** Integração com a API de *Web Speech Recognition* para comandos e buscas por voz diretamente no navegador.
-* 🍿🍔 **Gerador Inteligente de Combos:** Sugestões dinâmicas de petiscos, lanches e bebidas que combinam perfeitamente com a atmosfera do filme ou série recomendada.
-* 🎲 **Surpreenda-me:** Algoritmo de curadoria rápida para usuários indecisos.
-* 🎯 **Feedback Loop Ativo:** Sistema de re-ajuste de recomendação caso o usuário queira refinar o resultado (botão *"Não era bem isso"*), permitindo engajamento contínuo com a IA.
-* 🏆 **Top 10 & Coleções:** Painel de controle persistente contendo Histórico da Sessão, Favoritos, Títulos Assistidos e um Ranking dinâmico de popularidade pessoal.
-* ☀️/🌙 **Dual-Theme Imersivo:** Modo Escuro inspirado no veludo e penumbra das grandes telas e Modo Claro sofisticado baseado em tons marfim e dourado.
+🎙️ Interação por voz
 
----
+🧠 Recomendações inteligentes
 
-## 🛠️ Tecnologias e Arquitetura
+🎨 Identidade Visual
 
-O projeto foi construído focando em performance, zero dependências externas desnecessárias (*Vanilla Client*) e alta manutenibilidade de código:
+O CineMind foi projetado para transmitir a sensação de entrar em uma sala de cinema exclusiva.
 
-### Frontend (Client-Side)
-* **HTML5 Semântico:** Estruturação limpa focada em SEO e acessibilidade (regras de `role`, `aria-label` e estados de acessibilidade).
-* **CSS3 Avançado (Tokens & Variables):** Arquitetura CSS baseada em Design Tokens (`:root`), animações complexas (`cubic-bezier`), responsividade fluida (`clamp`) e transições de tema centralizadas.
-* **Vanilla JavaScript (ES6+):** 
-    * Arquitetura assíncrona baseada em `Async/Await` e manipulação precisa do DOM.
-    * Otimizações de performance (uso de `MutationObserver` para injeção de eventos em elementos dinâmicos).
-    * Gerenciamento de estados locais persistidos via `localStorage` (padrão *Repository* encapsulado no objeto `Store`).
+Elemento	Conceito
+🍷 Navbar Velvet Wine	Elegância e sofisticação
+🟡 Destaques Âmbar	Foco visual e contraste
+⚫ Fundo Cinematográfico	Imersão e conforto visual
+🤍 Cards Marfim	Leitura confortável
+🌙 Tema Escuro Premium	Atmosfera de cinema
+☀️ Tema Claro Sofisticado	Aparência moderna e limpa
+🚀 Principais Funcionalidades
+🧠 Recomendações Inteligentes
 
-### Backend & Integrações (Server-Side)
-* **Python / PyCharm:** Ambiente modularizado de desenvolvimento.
-* **Google Gemini API:** Integração de Large Language Models (LLMs) para análise de contexto, busca semântica no catálogo e geração de lanches temáticos.
-* **Acessibilidade Universal:** Inclusão nativa do ecossistema **VLibras** para tradução automática em tempo real para Língua Brasileira de Sinais.
+Descreva qualquer sensação:
 
----
+"Quero uma série parecida com The Night Of"
 
-## 💎 Diferenciais de Engenharia de Software (Para Recrutadores)
+"Estou procurando algo para explodir minha mente"
 
-Se você está avaliando este repositório para uma vaga técnica, aqui estão alguns padrões arquiteturais e boas práticas implementados no código:
+"Quero um filme para relaxar"
 
-1.  **Prevenção de Falhas de Segurança (XSS):** Todo dado renderizado dinamicamente no histórico ou em modais passa por uma função sanitizadora estrita de escape (`escapeHtml`), neutralizando injeções maliciosas.
-2.  **Sincronização Atômica de Estado:** O sistema de curtidas e histórico limpa e re-valida estados locais a cada nova requisição para impedir o vazamento de dados de um card (*Card Ghosting*) para o outro.
-3.  **Performance & UX (Auto-Scroll Fluido):** O efeito de *typewriter* calcula dinamicamente o tamanho do texto para acelerar a velocidade em respostas longas e realiza um *auto-scroll* suave ao final da página utilizando `scrollIntoView`, garantindo que o usuário nunca perda o foco da leitura.
-4.  **Respeito às Preferências do Sistema:** O código monitora a API `prefers-reduced-motion` do sistema operacional para desativar animações pesadas para usuários que necessitam de acessibilidade visual, além de verificar o `prefers-color-scheme` para carregar o tema padrão do usuário.
+A IA interpreta o contexto e encontra a melhor recomendação.
 
----
+🎙️ Busca por Voz
 
-## 📦 Como Rodar o Projeto Localmente
+Utilização da Web Speech API para pesquisas por voz diretamente no navegador.
 
-1. **Clone o repositório:**
-```bash
-   git clone [https://github.com/SEU-USUARIO/CineMind.git](https://github.com/SEU-USUARIO/CineMind.git)
-   cd CineMind
+🍿 Gerador de Combos
+
+Além da recomendação, o CineMind sugere:
+
+Lanches
+Petiscos
+Bebidas
+Combinações temáticas
+
+para transformar a sessão em uma experiência completa.
+
+❤️ Favoritos
+
+Salve seus títulos preferidos para assistir depois.
+
+📜 Histórico
+
+Acompanhe todas as recomendações recebidas.
+
+🏆 Top 10 Global
+
+Sistema de ranking baseado nos filmes mais favoritados pelos usuários.
+
+🎲 Surpreenda-me
+
+Para quem não sabe o que assistir.
+
+Um clique gera uma recomendação instantânea.
+
+🛠️ Stack Tecnológica
+Frontend
+HTML5
+CSS3
+JavaScript ES6+
+Backend
+Python
+Flask
+Inteligência Artificial
+Google Gemini API
+Armazenamento
+LocalStorage
+Persistência de favoritos
+Histórico de recomendações
+Acessibilidade
+VLibras
+Web Speech API
+prefers-color-scheme
+prefers-reduced-motion
+💎 Diferenciais Técnicos
+Segurança
+
+✔ Sanitização contra XSS
+
+✔ Escape de HTML dinâmico
+
+✔ Proteção contra injeções em conteúdos renderizados
+
+Performance
+
+✔ Async/Await
+
+✔ Atualizações dinâmicas do DOM
+
+✔ Auto-scroll inteligente
+
+✔ Typewriter otimizado
+
+Experiência do Usuário
+
+✔ Interface responsiva
+
+✔ Modo claro e escuro
+
+✔ Animações suaves
+
+✔ Feedback visual de carregamento
