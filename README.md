@@ -1,4 +1,4 @@
-<p align="center"> ## 🎬 CineMind — Sua IA do Cinema Premium 🍿</p>
+<h1 align="center">🎬 CineMind — Sua IA do Cinema Premium 🍿</h1>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.9+-blue.svg" alt="Python Version">
