@@ -1,21 +1,23 @@
 <div align="center">
-  <img src="https://img.shields.io/badge/Release-Premium_v2.0-f39c12?style=for-the-badge&logo=probot&logoColor=0a0c10" alt="CineMind Version">
-  <img src="https://img.shields.io/badge/UI/UX-Cinematic_Premium-e74c3c?style=for-the-badge" alt="UI/UX Cinematic">
-  <img src="https://img.shields.io/badge/AI--Integrated-Google_Gemini-00439C?style=for-the-badge&logo=google-gemini&logoColor=white" alt="AI Integrated">
+  <!-- Badges com as Cores Exatas do Site (Vinho, Âmbar e Preto) -->
+  <img src="https://img.shields.io/badge/Release-Premium_v2.0-f39c12?style=for-the-badge&logo=probot&logoColor=1f0505" alt="CineMind Version">
+  <img src="https://img.shields.io/badge/Ambiente-Velvet_Wine_&_Gold-4a1212?style=for-the-badge" alt="UI Velvet Wine">
+  <img src="https://img.shields.io/badge/AI--Integrated-Google_Gemini-11151c?style=for-the-badge&logo=google-gemini&logoColor=f5f5f5" alt="AI Integrated">
 
   <br><br>
 
+  <!-- Título Principal com a Identidade CineMind -->
   <h1>🎬 Cine<span>Mind</span> — Sua IA do Cinema</h1>
   
   <p align="center">
-    <strong>Uma aplicação web imersiva de recomendação inteligente e experiências cinematográficas movida a Inteligência Artificial.</strong>
+    <strong>Uma aplicação web imersiva de recomendação inteligente e curadoria de lanches movida a Inteligência Artificial.</strong>
   </p>
 
   <p align="center">
     <a href="#-funcionalidades-chave">Funcionalidades</a> •
+    <a href="#-identidade-visual-premium">Design Imersivo</a> •
     <a href="#-tecnologias-e-arquitetura">Tecnologias</a> •
-    <a href="#-diferenciais-de-engenharia-de-software">Diferenciais Técnicos</a> •
-    <a href="#-como-rodar-o-projeto">Como Rodar</a>
+    <a href="#-diferenciais-de-engenharia-de-software">Diferenciais Técnicos</a>
   </p>
 </div>
 
@@ -23,17 +25,22 @@
 
 ## 🎭 Sobre o CineMind
 
-O **CineMind** transforma a cansativa tarefa de escolher o próximo filme em uma experiência de cinema interativa em casa. Esqueça os filtros tradicionais e mecânicos: a plataforma foi desenvolvida para entender o **humor, os sentimentos e o contexto** do usuário expressos em linguagem natural através de texto ou voz, devolvendo indicações personalizadas integradas ao catálogo.
+O **CineMind** transforma o dilema de escolher o próximo filme em uma experiência de imersão completa. O software compreende o humor, os sentimentos e os desejos do usuário transmitidos em linguagem natural (por digitação ou voz) e realiza uma busca semântica inteligente no catálogo para entregar o título ideal.
 
-A interface foi projetada milimetricamente para simular a penumbra e a sofisticação de uma sala de cinema premium, alternando dinamicamente entre efeitos de iluminação ambiente digital (*ambient glow*), vinhetas e um efeito interativo de máquina de escrever (*typewriter*) que dá vida às respostas da IA.
+### 🎨 Identidade Visual Premium (Fidelidade de Interface)
+Inspirado na atmosfera requintada das salas de cinema e grandes teatros, o design da interface conta com:
+* **Navbar em Vinho Profundo:** Uma barra superior sólida em tom veludo que organiza elegantemente o fluxo de navegação e as contagens dinâmicas.
+* **Penumbra Computacional:** Telas escuras e texturizadas com gradientes pretos e cinza-carvão que reduzem a fadiga ocular e focam o olhar na tela.
+* **Luzes de Arandela Digitais:** Pontos de iluminação âmbar difusa nos cantos que simulam os refletores laterais de uma sala real antes do filme começar.
+* **Cards de Leitura em Creme/Marfim:** Bloco de contraste projetado na cor marfim para garantir uma legibilidade perfeita, clara e polida das respostas da IA.
 
 ---
 
 ## 🚀 Funcionalidades-Chave
 
-* 🧠 **Busca Semântica por Humor:** O usuário dita o que quer assistir em linguagem natural (ex: *"Quero um suspense psicológico que exploda minha mente e tenha um final surpreendente"*).
+* 🧠 **Busca Semântica por Humor:** O usuário dita o que quer assistir em linguagem natural (ex: *"Quero uma série do estilo The Night Of"*).
 * 🎙️ **Interface de Voz Nativa:** Integração com a API de *Web Speech Recognition* para comandos e buscas por voz diretamente no navegador.
-* 🥤🍟 **Gerador Inteligente de Combos:** Sugestões dinâmicas de petiscos, lanches e bebidas que combinam perfeitamente com a atmosfera do filme ou série recomendada.
+* 🍿🍔 **Gerador Inteligente de Combos:** Sugestões dinâmicas de petiscos, lanches e bebidas que combinam perfeitamente com a atmosfera do filme ou série recomendada.
 * 🎲 **Surpreenda-me:** Algoritmo de curadoria rápida para usuários indecisos.
 * 🎯 **Feedback Loop Ativo:** Sistema de re-ajuste de recomendação caso o usuário queira refinar o resultado (botão *"Não era bem isso"*), permitindo engajamento contínuo com a IA.
 * 🏆 **Top 10 & Coleções:** Painel de controle persistente contendo Histórico da Sessão, Favoritos, Títulos Assistidos e um Ranking dinâmico de popularidade pessoal.
@@ -48,7 +55,8 @@ O projeto foi construído focando em performance, zero dependências externas de
 ### Frontend (Client-Side)
 * **HTML5 Semântico:** Estruturação limpa focada em SEO e acessibilidade (regras de `role`, `aria-label` e estados de acessibilidade).
 * **CSS3 Avançado (Tokens & Variables):** Arquitetura CSS baseada em Design Tokens (`:root`), animações complexas (`cubic-bezier`), responsividade fluida (`clamp`) e transições de tema centralizadas.
-* **Vanilla JavaScript (ES6+):** * Arquitetura assíncrona baseada em `Async/Await` e manipulação precisa do DOM.
+* **Vanilla JavaScript (ES6+):** 
+    * Arquitetura assíncrona baseada em `Async/Await` e manipulação precisa do DOM.
     * Otimizações de performance (uso de `MutationObserver` para injeção de eventos em elementos dinâmicos).
     * Gerenciamento de estados locais persistidos via `localStorage` (padrão *Repository* encapsulado no objeto `Store`).
 
@@ -73,6 +81,6 @@ Se você está avaliando este repositório para uma vaga técnica, aqui estão a
 ## 📦 Como Rodar o Projeto Localmente
 
 1. **Clone o repositório:**
-   ```bash
+```bash
    git clone [https://github.com/SEU-USUARIO/CineMind.git](https://github.com/SEU-USUARIO/CineMind.git)
    cd CineMind
