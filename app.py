@@ -6,7 +6,7 @@ from threading import Lock
 
 # Define o seu token diretamente no ambiente do sistema operacional ANTES de importar o SDK.
 # O SDK lê essa variável de ambiente específica automaticamente, aceitando o formato "AQ.".
-os.environ["GEMINI_API_KEY"] = "AQ.Ab8RN6J_4-VSENSlZCzqh5YMz2zE9vF_iqsDvUThgoFM3zCAXw"
+os.environ["GEMINI_API_KEY"] = "AQ.Ab8RN6IJO_t8q0ACkRi9Nhro1Wre-9-3jPLV10O3vyCLqzus4Q"
 
 from google import genai
 from flask import Flask, render_template, request, jsonify
