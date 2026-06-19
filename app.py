@@ -3,6 +3,11 @@ import json
 import random
 import time
 from threading import Lock
+
+# Define o seu token diretamente no ambiente do sistema operacional ANTES de importar o SDK.
+# O SDK lê essa variável de ambiente específica automaticamente, aceitando o formato "AQ.".
+os.environ["GEMINI_API_KEY"] = "AQ.Ab8RN6J_4-VSENSlZCzqh5YMz2zE9vF_iqsDvUThgoFM3zCAXw"
+
 from google import genai
 from flask import Flask, render_template, request, jsonify
 
@@ -15,19 +20,11 @@ TOP10_FILE = "top10_global.json"
 # top10_global.json ao mesmo tempo (evita corrupção/perda de votos)
 contagem_lock = Lock()
 
-# ── Lê a API key do .env manualmente ──────────────────────────────────────────
-pasta_atual = os.path.dirname(os.path.abspath(__file__))
-caminho_env = os.path.join(pasta_atual, '.env')
-
-minha_chave = None
-with open(caminho_env, 'r', encoding='utf-8') as f:
-    for linha in f:
-        if linha.startswith("GEMINI_API_KEY="):
-            minha_chave = linha.split("=")[1].strip()
-
-client = genai.Client(api_key=minha_chave)
+# Inicializa o cliente limpo. Ele lerá a variável injetada acima automaticamente.
+client = genai.Client()
 
 # ── Carrega o catálogo de filmes com as plataformas inclusas ─────────────────
+pasta_atual = os.path.dirname(os.path.abspath(__file__))
 caminho_json = os.path.join(pasta_atual, 'filmes.json')
 with open(caminho_json, 'r', encoding='utf-8') as arquivo:
     catalogo_filmes = json.load(arquivo)
@@ -50,21 +47,18 @@ def salvar_contagem(dados):
 def gerar_conteudo_com_tentativas(prompt, max_tentativas=3):
     for tentativa in range(max_tentativas):
         try:
-            # Usando o gemini-2.5-flash estável
+            # Usando o modelo moderno correto na biblioteca certa
             response = client.models.generate_content(
                 model='gemini-2.5-flash',
                 contents=prompt,
             )
             return response.text
         except Exception as e:
-            # Imprime o erro real no terminal do PyCharm para você saber o diagnóstico exato
             print(f"⚠️ Tentativa {tentativa + 1} falhou. Motivo: {e}")
 
-            # Se for a última tentativa, entrega o aviso amigável para a interface
             if tentativa == max_tentativas - 1:
                 return f"❌ Nossos servidores estão um pouco lentos agora. Pode tentar novamente em alguns segundos?"
 
-            # Se não for a última, aguarda um tempo progressivo (backoff sutil) e tenta de novo
             time.sleep(2)
 
 
@@ -215,7 +209,7 @@ def favoritar():
 @app.route("/top10-global", methods=["GET"])
 def top10_global():
     with contagem_lock:
-        contagem = carregar_contagem()
+        contagem = caragem = carregar_contagem()
     ranking = sorted(contagem.items(), key=lambda x: x[1], reverse=True)[:10]
     return jsonify({"top10": [{"titulo": t, "favoritos": c} for t, c in ranking if c > 0]})
 
